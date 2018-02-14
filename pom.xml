@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>deors.demos</groupId>
+    <artifactId>deors-demos-microservices</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>deors-demos-microservices</name>
+    <description>
+        Demonstration of an exemplar microservices stack based in Spring Boot,
+        Spring Cloud and Netflix OSS, including step-by-step instructions
+        to recreate the demo stack and run it in different environments
+    </description>
+
+    <modules>
+        <module>deors-demos-microservices-configservice</module>
+        <module>deors-demos-microservices-eurekaservice</module>
+        <module>deors-demos-microservices-hystrixservice</module>
+        <module>deors-demos-microservices-turbineservice</module>
+        <module>deors-demos-microservices-bookrecservice</module>
+        <module>deors-demos-microservices-bookrecedgeservice</module>
+    </modules>
+
+</project>
