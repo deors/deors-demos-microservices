@@ -1,4 +1,4 @@
-# deors-demos-microservices-docs
+# deors-demos-microservices
 
 ## Microservices with Spring Boot, Spring Cloud and Netflix OSS
 
@@ -25,7 +25,7 @@ Create the file `application.properties`. This file will contain settings which 
     spring.jpa.generate-ddl = true
     management.security.enabled = false
 
-The third configuration setting will disable security for actuator endpoints, which allows for remote operations of running applications. Disabling security in this manner should be done only when public access to those endpoints is restricted externally (for example through the web server or reverse proxy). Never expose actuator endpoints publicly and insecurely!
+The third configuration setting will disable security for actuator endpoints, which allows for remote operations on running applications. Disabling security in this manner should be done only when public access to those endpoints is restricted externally (for example through the web server or reverse proxy). Never expose actuator endpoints publicly and insecurely!
 
 Next, we will add the setting for all microservices. These settings may not be obvious now, but they will later once they are needed.
 
