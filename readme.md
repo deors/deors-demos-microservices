@@ -323,7 +323,7 @@ To configure the service to be discoverable (Eureka) and to use the circuit brea
     @org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker
 ```
 
-Next, add the `restTemplate()` method which will initalize the RestTemplate object which will be used to invoke bookrecservice. Client-side load balancing (Ribbon) is enabled just by adding the corresponding annotation:
+Next, add the `restTemplate()` method to initalize the RestTemplate object which will be used to invoke bookrecservice. Client-side load balancing (Ribbon) is enabled just by adding the corresponding annotation:
 
 ```java
     @Bean
@@ -399,7 +399,7 @@ Access the HAL browser on the book recommendation service:
 
     http://localhost:8080/
 
-Access the book recommendation service iself:
+Access the book recommendation service itself:
 
     http://localhost:8080/bookrec
 
