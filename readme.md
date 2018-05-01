@@ -227,7 +227,7 @@ Create the Book entity class:
     }
 ```
 
-Add bean constructors, getters, setters and toString method, or generate it with your IDE!
+Add bean constructors, getters, setters and toString method, or generate them with your IDE!
 
 Create the BookRepository data access interface:
 
@@ -323,7 +323,7 @@ To configure the service to be discoverable (Eureka) and to use the circuit brea
     @org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker
 ```
 
-Next, add the `restTemplate()` method to enable client-side load balancing (Ribbon) when calling bookrecservice:
+Next, add the `restTemplate()` method which will initalize the RestTemplate object which will be used to invoke bookrecservice. Client-side load balancing (Ribbon) is enabled just by adding the corresponding annotation:
 
 ```java
     @Bean
@@ -341,7 +341,7 @@ Create the Book bean for the edge service:
         private String author;
     }
 
-Add bean constructors (including one with the three properties), getters, setters and toString method, or generate it with your IDE!
+Add bean constructors (including one with the three properties), getters, setters and toString method, or generate them with your IDE!
 
 Create the BookController controller for the edge service, including the call to bookrec through Hystrix and providing the default fallback method in case of problems with calls to bookrec:
 
