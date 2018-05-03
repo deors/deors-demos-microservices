@@ -128,7 +128,7 @@ Edit `src\main\resources\bootstrap.properties`:
     spring.application.name = eurekaservice
     spring.cloud.config.uri = http://${CONFIG_HOST:localhost}:${CONFIG_PORT:8888}
 
-To configure the Eureka server to start automatically, edit `src\main\java\deors\demos\microservices\eurekaservice\Application.java` and add the following class annotation:
+To configure the Eureka server to start automatically, edit `src\main\java\deors\demos\microservices\eurekaservice\EurekaserviceApplication.java` and add the following class annotation:
 
 ```java
     @org.springframework.cloud.netflix.eureka.server.EnableEurekaServer
@@ -373,6 +373,15 @@ Services are now ready to be executed locally, using the sensible default config
 Each service will be run by executing this command in each folder:
 
     mvn spring-boot:run
+
+Follow the next sequence for running the services to let retrieve the configuration and register the services properly:
+
+    - configservice
+    - eurekaservice
+    - hystrixservice
+    - bookrecservice
+    - bookrecedgeservice
+
 
 ### 1.8) Test services locally
 
