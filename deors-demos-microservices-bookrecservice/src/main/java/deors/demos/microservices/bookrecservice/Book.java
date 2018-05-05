@@ -4,23 +4,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-/**
- * Created by jorge.hidalgo on 09/10/2016.
- */
 @Entity
 public class Book {
-    @Id
-    @GeneratedValue
-    private Long id;
 
+    @Id @GeneratedValue private Long id;
     private String title;
-
     private String author;
 
     public Book() {
+        super();
     }
 
-    public Book(String title, String author) {
+    public Book(Long id, String title, String author) {
+        this();
+        this.id = id;
         this.title = title;
         this.author = author;
     }
@@ -51,10 +48,6 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                '}';
+        return "Book [id=" + id + ", title=" + title + ", author=" + author + "]";
     }
 }

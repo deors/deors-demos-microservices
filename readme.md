@@ -183,7 +183,7 @@ To configure the Hystrix dashboard to start automatically, edit `src\main\java\d
 
 ### 1.5) Set up the book recommendation service
 
-This is the first microservice with actual functionality on our problem domain. bookrec is the service which provides methods to query, create, update and remove Book entities from the data store.
+This is the first microservice with actual functionality on the application functional domain. bookrec service is the service which provides methods to query, create, update and remove Book entities from the data store.
 
 Go to `https://start.spring.io/` and create the project with the following settings:
 
@@ -227,21 +227,21 @@ Create the Book entity class:
 ```java
 @Entity
 public class Book {
-    @Id
-    @GeneratedValue
-    private Long id;
+
+    @Id @GeneratedValue private Long id;
     private String title;
     private String author;
 }
 ```
 
-Add bean constructors, getters, setters and toString method, or generate them with your IDE!
+Add bean constructors (including the default constructor and one that initalizes the three properties), getters, setters and toString method, or generate them with your IDE!
 
 Create the BookRepository data access interface:
 
 ```java
 @RepositoryRestResource
 public interface BookRepository extends CrudRepository<Book, Long> {
+
     @Query("select b from Book b order by RAND()")
     List<Book> getBooksRandomOrder();
 }
@@ -252,6 +252,7 @@ Create the BookController controller class:
 ```java
 @RestController
 public class BookController {
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -278,7 +279,7 @@ insert into book(id, title, author) values (9, 'starship troopers', 'robert a. h
 
 ### 1.6) Set up the book recommendation edge service
 
-The bookrec edge service is used by clients to interact with the bookrec service. As a general rule, services with business logic and access to data stores, should not be exposed directly to clients. Therefore, they are called inner services. Edge services will wrap access to inner services, as well as adding other non-functional capabilities, like routing, throttling, caching or fault tolerance.
+The bookrec edge service is used by clients to interact with the bookrec service. As a general rule, services with business logic and access to data stores, should not be exposed directly to clients. Therefore, they are called inner services. Edge services will wrap access to inner services, as well as adding other non-functional capabilities, like routing, throttling, caching, data aggregation or fault tolerance.
 
 Go to `https://start.spring.io/` and create the project with the following settings:
 
@@ -328,19 +329,23 @@ RestTemplate restTemplate() {
 
 Create the Book bean for the edge service, which is analogous to the Book bean for the inner service but without any persistence related code or configuration:
 
+```java
 public class Book {
+
     private Long id;
     private String title;
     private String author;
 }
+```
 
-Add bean constructors (including one with the four properties), getters, setters and toString method, or generate them with your IDE!
+Add bean constructors (including the default constructor and one that initalizes the three properties), getters, setters and toString method, or generate them with your IDE!
 
 Create the BookController controller for the edge service, including the call to bookrec through Hystrix and providing the default fallback method in case of problems with calls to bookrec:
 
 ```java
 @RestController
 public class BookController {
+
     @Autowired
     RestTemplate restTemplate;
 
