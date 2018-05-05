@@ -6,7 +6,7 @@ Demonstration of an exemplar microservices stack based in Spring Boot, Spring Cl
 
 This demo is organised in iterations, starting from the basics and building up in complexity and features along the way.
 
-NOTE: The following instructions are created on a Windows machine, hence some commands may need slight adjustments when working on Linux/OSX, e.g. replace `%ENV_VAR%` by `${ENV_VAR}`.
+NOTE: The following instructions are created on a Windows machine, hence some commands may need slight adjustments when working on Linux/OSX, e.g. replace `%ENV_VAR%` by `${ENV_VAR}`, and replace back-slashes by forward-slashes.
 
 ## Iteration 1) The basics
 
@@ -16,8 +16,8 @@ The configuration store is a repository where microservice settings are stored, 
 
 Create and change to a directory for the project:
 
-    mkdir %HOME%\microservices\deors-demos-microservices-configstore
-    cd %HOME%\microservices\deors-demos-microservices-configstore
+    mkdir %HOME%\microservices\configstore
+    cd %HOME%\microservices\configstore
 
 Create the file `application.properties`. This file will contain settings which are common to all microservices:
 
@@ -51,7 +51,9 @@ Create the file `bookrecedgeservice.properties`:
     server.port = ${PORT:8181}
     eureka.client.serviceUrl.defaultZone = http://${EUREKA_HOST:localhost}:${EUREKA_PORT:7878}/eureka/
     ribbon.eureka.enabled = true
-    defaultBook = this is the default recommendation: Book {id=-1, title='robots of dawn', author='isaac asimov'}
+    defaultBookId = -1
+    defaultBookTitle = robots of dawn
+    defaultBookAuthor = isaac asimov
 
 Initialise the Git repository:
 
@@ -59,10 +61,12 @@ Initialise the Git repository:
     git add .
     git commit -m "initial configuration"
 
-Publish it online (replace the actual URL with your own repository):
+Publish it to any remote repository online (replace the actual URL with your own repository):
 
     git remote add origin https://github.com/deors/deors-demos-microservices-configstore.git
     git push origin master
+
+It is also possible to use the local repository, without pushing it to a remote repository. A local repository is enough to test services locally (Iteration 1), but a remote repository will be needed later, as services are distributed across multiple nodes and hence the local repository might not be accessible to every service instance.
 
 ### 1.2) Set up the configuration service
 
@@ -71,7 +75,7 @@ The configuration service, powered by Spring Cloud Config Server, is the microse
 Go to `https://start.spring.io/` and create the project with the following settings:
 
     group: deors.demos.microservices
-    artifact: deors-demos-microservices-configservice
+    artifact: configservice
     depedencies:
         actuator
         config server
@@ -84,18 +88,23 @@ Extract the generated zip to:
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\deors-demos-microservices-configservice
+    cd %HOME%\microservices\configservice
 
 Next, let's add the application name and set the configuration store location. Edit `src\main\resources\application.properties`:
 
     server.port = ${PORT:8888}
     spring.application.name = configservice
     spring.cloud.config.server.git.uri = ${CONFIG_REPO_URL:https://github.com/deors/deors-demos-microservices-configstore.git}
+    management.security.enabled = false
+
+If the configuration store is local, leverage the File protocol in Git:
+
+    spring.cloud.config.server.git.uri = ${CONFIG_REPO_URL:file:///%HOME%/microservices/configstore}
 
 To configure the configuration server to start automatically, edit `src\main\java\deors\demos\microservices\configservice\ConfigserviceApplication.java` and add the following class annotation:
 
 ```java
-    @org.springframework.cloud.config.server.EnableConfigServer
+@org.springframework.cloud.config.server.EnableConfigServer
 ```
 
 ### 1.3) Set up the service registry and discovery service (Eureka)
@@ -105,7 +114,7 @@ The service registry and discovery service, powered by Spring Cloud and Netflix 
 Go to `https://start.spring.io/` and create the project with the following settings:
 
     group: deors.demos.microservices
-    artifact: deors-demos-microservices-eurekaservice
+    artifact: eurekaservice
     depedencies:
         actuator
         config client
@@ -117,7 +126,7 @@ Extract the generated zip to:
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\deors-demos-microservices-eurekaservice
+    cd %HOME%\microservices\eurekaservice
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
@@ -131,7 +140,7 @@ Edit `src\main\resources\bootstrap.properties`:
 To configure the Eureka server to start automatically, edit `src\main\java\deors\demos\microservices\eurekaservice\Application.java` and add the following class annotation:
 
 ```java
-    @org.springframework.cloud.netflix.eureka.server.EnableEurekaServer
+@org.springframework.cloud.netflix.eureka.server.EnableEurekaServer
 ```
 
 ### 1.4) Set up the circuit breaker dashboard service (Hystrix)
@@ -141,7 +150,7 @@ The circuit breaker dashboard, powered by Spring Cloud and Netflix Hystrix, will
 Go to `https://start.spring.io/` and create the project with the following settings:
 
     group: deors.demos.microservices
-    artifact: deors-demos-microservices-hystrixservice
+    artifact: hystrixservice
     depedencies:
         actuator
         config client
@@ -154,7 +163,7 @@ Extract the generated zip to:
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\deors-demos-microservices-hystrixservice
+    cd %HOME%\microservices\hystrixservice
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
@@ -168,8 +177,8 @@ Edit `src\main\resources\bootstrap.properties`:
 To configure the Hystrix dashboard to start automatically, edit `src\main\java\deors\demos\microservices\hystrixservice\HystrixserviceApplication.java` and add the following class annotations:
 
 ```java
-    @org.springframework.cloud.client.discovery.EnableDiscoveryClient
-    @org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard
+@org.springframework.cloud.client.discovery.EnableDiscoveryClient
+@org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard
 ```
 
 ### 1.5) Set up the book recommendation service
@@ -179,7 +188,7 @@ This is the first microservice with actual functionality on our problem domain. 
 Go to `https://start.spring.io/` and create the project with the following settings:
 
     group: deors.demos.microservices
-    artifact: deors-demos-microservices-bookrecservice
+    artifact: bookrecservice
     depedencies:
         actuator
         config client
@@ -187,7 +196,6 @@ Go to `https://start.spring.io/` and create the project with the following setti
         web
         rest repositories
         rest repositories hal browser
-        hateoas
         jpa
         h2
 
@@ -197,7 +205,7 @@ Extract the generated zip to:
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\deors-demos-microservices-bookrecservice
+    cd %HOME%\microservices\bookrecservice
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
@@ -211,20 +219,20 @@ Edit `src\main\resources\bootstrap.properties`:
 To configure the service to be discoverable, edit `src\main\java\deors\demos\microservices\bookrecservice\BookrecserviceApplication.java` and add the class annotation:
 
 ```java
-    @org.springframework.cloud.client.discovery.EnableDiscoveryClient
+@org.springframework.cloud.client.discovery.EnableDiscoveryClient
 ```
 
 Create the Book entity class:
 
 ```java
-    @Entity
-    public class Book {
-        @Id
-        @GeneratedValue
-        private Long id;
-        private String title;
-        private String author;
-    }
+@Entity
+public class Book {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String title;
+    private String author;
+}
 ```
 
 Add bean constructors, getters, setters and toString method, or generate them with your IDE!
@@ -232,43 +240,40 @@ Add bean constructors, getters, setters and toString method, or generate them wi
 Create the BookRepository data access interface:
 
 ```java
-    @RepositoryRestResource
-    public interface BookRepository extends CrudRepository<Book, Long> {
-        @Query("select b from Book b order by RAND()")
-        List<Book> getBooksRandomOrder();
-    }
+@RepositoryRestResource
+public interface BookRepository extends CrudRepository<Book, Long> {
+    @Query("select b from Book b order by RAND()")
+    List<Book> getBooksRandomOrder();
+}
 ```
 
 Create the BookController controller class:
 
 ```java
-    @RestController
-    public class BookController {
-        @Autowired
-        private BookRepository bookRepository;
+@RestController
+public class BookController {
+    @Autowired
+    private BookRepository bookRepository;
 
-        @RequestMapping("/bookrec")
-        public String getBookRecommendation() throws UnknownHostException {
-            return "the host in IP: "
-                    + InetAddress.getLocalHost().getHostAddress()
-                    + " recommends this book: "
-                    + bookRepository.getBooksRandomOrder().get(0);
-        }
+    @RequestMapping("/bookrec")
+    public Book getBookRecommendation() {
+        return bookRepository.getBooksRandomOrder().get(0);
     }
+}
 ```
 
 Let's add some test data. For that, create the file `src/main/resources/import.sql` and populate it with some test data for the bookrec service:
 
 ```sql
-    insert into book(id, title, author) values (1, 'second foundation', 'isaac asimov')
-    insert into book(id, title, author) values (2, 'speaker for the dead', 'orson scott card')
-    insert into book(id, title, author) values (3, 'the player of games', 'iain m. banks')
-    insert into book(id, title, author) values (4, 'the lord of the rings', 'j.r.r. tolkien')
-    insert into book(id, title, author) values (5, 'the warrior apprentice', 'lois mcmaster bujold')
-    insert into book(id, title, author) values (6, 'blood of elves', 'andrzej sapkowski')
-    insert into book(id, title, author) values (7, 'harry potter and the prisoner of azkaban', 'j.k. rowling')
-    insert into book(id, title, author) values (8, '2010: odyssey two', 'arthur c. clarke')
-    insert into book(id, title, author) values (9, 'starship troopers', 'robert a. heinlein')
+insert into book(id, title, author) values (1, 'second foundation', 'isaac asimov')
+insert into book(id, title, author) values (2, 'speaker for the dead', 'orson scott card')
+insert into book(id, title, author) values (3, 'the player of games', 'iain m. banks')
+insert into book(id, title, author) values (4, 'the lord of the rings', 'j.r.r. tolkien')
+insert into book(id, title, author) values (5, 'the warrior apprentice', 'lois mcmaster bujold')
+insert into book(id, title, author) values (6, 'blood of elves', 'andrzej sapkowski')
+insert into book(id, title, author) values (7, 'harry potter and the prisoner of azkaban', 'j.k. rowling')
+insert into book(id, title, author) values (8, '2010: odyssey two', 'arthur c. clarke')
+insert into book(id, title, author) values (9, 'starship troopers', 'robert a. heinlein')
 ```
 
 ### 1.6) Set up the book recommendation edge service
@@ -278,7 +283,7 @@ The bookrec edge service is used by clients to interact with the bookrec service
 Go to `https://start.spring.io/` and create the project with the following settings:
 
     group: deors.demos.microservices
-    artifact: deors-demos-microservices-bookrecedgeservice
+    artifact: bookrecedgeservice
     depedencies:
         actuator
         config client
@@ -286,9 +291,6 @@ Go to `https://start.spring.io/` and create the project with the following setti
         hystrix
         ribbon
         web
-        rest repositories
-        rest repositories hal browser
-        hateoas
 
 Extract the generated zip to:
 
@@ -296,7 +298,7 @@ Extract the generated zip to:
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\deors-demos-microservices-bookrecedgeservice
+    cd %HOME%\microservices\bookrecedgeservice
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
@@ -307,63 +309,55 @@ Edit `src\main\resources\bootstrap.properties`:
     spring.application.name = bookrecedgeservice
     spring.cloud.config.uri = http://${CONFIG_HOST:localhost}:${CONFIG_PORT:8888}
 
-There is one dependency that is currently not being added by the Spring Boot starter BOM's and must be added manually. Edit `pom.xml` and add the following dependency:
-
-```xml
-    <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-netflix-hystrix-stream</artifactId>
-    </dependency>
-```
-
 To configure the service to be discoverable (Eureka) and to use the circuit breaker (Hystrix), edit `src\main\java\deors\demos\microservices\bookrecedgeservice\BookrecedgeserviceApplication.java` and add the following class annotations:
 
 ```java
-    @org.springframework.cloud.client.discovery.EnableDiscoveryClient
-    @org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker
+@org.springframework.cloud.client.discovery.EnableDiscoveryClient
+@org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker
 ```
 
 Next, add the `restTemplate()` method to initalize the RestTemplate object which will be used to invoke bookrecservice. Client-side load balancing (Ribbon) is enabled just by adding the corresponding annotation:
 
 ```java
-    @Bean
-    @org.springframework.cloud.client.loadbalancer.LoadBalanced
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+@Bean
+@org.springframework.cloud.client.loadbalancer.LoadBalanced
+RestTemplate restTemplate() {
+    return new RestTemplate();
+}
 ```
 
-Create the Book bean for the edge service:
+Create the Book bean for the edge service, which is analogous to the Book bean for the inner service but without any persistence related code or configuration:
 
-    public class Book {
-        private Long id;
-        private String title;
-        private String author;
-    }
+public class Book {
+    private Long id;
+    private String title;
+    private String author;
+}
 
-Add bean constructors (including one with the three properties), getters, setters and toString method, or generate them with your IDE!
+Add bean constructors (including one with the four properties), getters, setters and toString method, or generate them with your IDE!
 
 Create the BookController controller for the edge service, including the call to bookrec through Hystrix and providing the default fallback method in case of problems with calls to bookrec:
 
 ```java
-    @RestController
-    class BookController {
-        @Autowired
-        RestTemplate restTemplate;
+@RestController
+public class BookController {
+    @Autowired
+    RestTemplate restTemplate;
 
-        @Value("${defaultBook}")
-        private String defaultBook;
+    @Value("${defaultBookId}") private long defaultBookId;
+    @Value("${defaultBookTitle}") private String defaultBookTitle;
+    @Value("${defaultBookAuthor}") private String defaultBookAuthor;
 
-        @RequestMapping("/bookrecedge")
-        @com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand(fallbackMethod = "getDefaultBook")
-        public String getBookRecommendation() {
-            return restTemplate.getForObject("http://bookrecservice/bookrec", String.class);
-        }
-
-        public String getDefaultBook() {
-            return defaultBook;
-        }
+    @RequestMapping("/bookrecedge")
+    @com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand(fallbackMethod = "getDefaultBook")
+    public Book getBookRecommendation() {
+        return restTemplate.getForObject("http://bookrecservice/bookrec", Book.class);
     }
+
+    public Book getDefaultBook() {
+        return new Book(defaultBookId, defaultBookTitle, defaultBookAuthor);
+    }
+}
 ```
 
 ### 1.7) Run the services locally
@@ -372,14 +366,31 @@ Services are now ready to be executed locally, using the sensible default config
 
 Each service will be run by executing this command in each folder:
 
-    mvn spring-boot:run
+    mvnw spring-boot:run
+
+Alternatively, the Spring Boot fat Jar can be created and executed directly:
+
+    mvnw package
+    java -jar target/<name-of-the-fat.jar>
+
+When using Java 9+, Spring Boot does not add JAX-B module (java.xml.bind) to Tomcat module path automatically, causing some services to fail on startup. In that case, the missing module should be added to Tomcat module path. When using `spring-boot:run` Maven goal to run the application, use the `JDK_JAVA_OPTIONS` environment variable:
+
+    set JDK_JAVA_OPTIONS=--add-modules java.xml.bind
+    mvnw spring-boot:run
+
+When executing the fat Jar directly:
+
+    java -jar target/<name-of-the-fat.jar> --add-modules java.xml.bind
+
+The module path might also be configured in `pom.xml` file.
 
 ### 1.8) Test services locally
 
 Once all the services are started, they will be available at the defined ports in the local host.
 
-Access the configuration service through one the actuator endpoints (remember it is currently unsecured):
+Access the configuration service through some the actuator endpoints (remember it is currently unsecured):
 
+    http://localhost:8888/health
     http://localhost:8888/env
 
 Check that the configuration service is capable of returning the configuration for some of the services:
@@ -402,10 +413,6 @@ Access the HAL browser on the book recommendation service:
 Access the book recommendation service itself:
 
     http://localhost:8080/bookrec
-
-Access the HAL browser on the book recommendation edge service:
-
-    http://localhost:8181/
 
 Access the book recommendation edge service itself:
 
@@ -507,7 +514,7 @@ In this section, pom files will be configured with Spotify's Docker Maven plug-i
 
 Let's proceed with bookrec service as an example. Change to its directory:
 
-    cd %HOME%\microservices\deors-demos-microservices-bookrecservice
+    cd %HOME%\microservices\bookrecservice
 
 Edit `pom.xml` and add inside `<properties>` the following property:
 
@@ -637,10 +644,6 @@ Access the HAL browser on the book recommendation service:
 Access the book recommendation service iself:
 
     http://192.168.66.100:8080/bookrec
-
-Access the HAL browser on the book recommendation edge service:
-
-    http://192.168.66.100:8181/
 
 Access the book recommendation edge service itself:
 
