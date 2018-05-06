@@ -389,7 +389,7 @@ When executing the fat Jar directly:
 
 The module path might also be configured in `pom.xml` file.
 
-Follow the next sequence for running the services to let retrieve the configuration and register the services properly:
+Follow the next sequence for running the services in order so they are able to leverage the configuration and registry services during startup:
 
     - configservice
     - eurekaservice
@@ -397,12 +397,11 @@ Follow the next sequence for running the services to let retrieve the configurat
     - bookrecservice
     - bookrecedgeservice
 
-
 ### 1.8) Test services locally
 
 Once all the services are started, they will be available at the defined ports in the local host.
 
-Access the configuration service through some the actuator endpoints (remember it is currently unsecured):
+Access the configuration service through some of the actuator endpoints (remember they are currently unsecured):
 
     http://localhost:8888/health
     http://localhost:8888/env
@@ -634,8 +633,9 @@ To quickly check whether all services are up and their configuration, use this c
 
 Once all the services are started, they will be available at the defined ports in the local host.
 
-Access the configuration service through one the actuator endpoints (remember it is currently unsecured):
+Access the configuration service through some of the actuator endpoints (remember they are currently unsecured):
 
+    http://192.168.66.100:8888/health
     http://192.168.66.100:8888/env
 
 Check that the configuration service is capable of returning the configuration for some of the services:
