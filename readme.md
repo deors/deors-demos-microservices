@@ -225,6 +225,10 @@ To configure the service to be discoverable, edit `src\main\java\deors\demos\mic
 Create the Book entity class:
 
 ```java
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 @Entity
 public class Book {
 
@@ -239,6 +243,11 @@ Add bean constructors (including the default constructor and one that initalizes
 Create the BookRepository data access interface:
 
 ```java
+import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
 @RepositoryRestResource
 public interface BookRepository extends CrudRepository<Book, Long> {
 
@@ -250,6 +259,10 @@ public interface BookRepository extends CrudRepository<Book, Long> {
 Create the BookController controller class:
 
 ```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 public class BookController {
 
@@ -320,7 +333,7 @@ To configure the service to be discoverable (Eureka) and to use the circuit brea
 Next, add the `restTemplate()` method to initalize the RestTemplate object which will be used to invoke bookrecservice. Client-side load balancing (Ribbon) is enabled just by adding the corresponding annotation:
 
 ```java
-@Bean
+@org.springframework.context.annotation.Bean
 @org.springframework.cloud.client.loadbalancer.LoadBalanced
 RestTemplate restTemplate() {
     return new RestTemplate();
@@ -343,6 +356,12 @@ Add bean constructors (including the default constructor and one that initalizes
 Create the BookController controller for the edge service, including the call to bookrec through Hystrix and providing the default fallback method in case of problems with calls to bookrec:
 
 ```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
 @RestController
 public class BookController {
 
