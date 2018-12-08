@@ -554,37 +554,28 @@ Edit `pom.xml` and add inside `<properties>` the following property:
     <docker.image.prefix>deors</docker.image.prefix>
 ```
 
+This property will be used to identify the registry organisation where the generated images will be pushed.
+
 Add inside `<build><plugins>` Spotify's Docker Maven plug-in configuration:
 
 ```xml
     <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.1</version>
         <configuration>
-            <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-            <dockerDirectory>src/main/docker</dockerDirectory>
+            <dockerDirectory>${project.basedir}</dockerDirectory>
+            <imageName>${docker.image.prefix}/${project.name}</imageName>
             <imageTags>
                 <imageTag>${project.version}</imageTag>
                 <imageTag>latest</imageTag>
             </imageTags>
             <serverId>docker-hub</serverId>
-            <resources>
-                <resource>
-                    <targetPath>/</targetPath>
-                    <directory>${project.build.directory}</directory>
-                    <include>${project.build.finalName}.jar</include>
-                </resource>
-            </resources>
         </configuration>
     </plugin>
 ```
 
-Create a new directory for the Dockerfile:
-
-    mkdir src\main\docker
-
-Create the file `src\main\docker\Dockerfile` and add the following content:
+Create the file `Dockerfile` and add the following content:
 
     FROM frolvlad/alpine-oraclejdk8:slim
     VOLUME /tmp

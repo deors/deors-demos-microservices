@@ -27,7 +27,7 @@
 
         <spring-cloud.version>Edgware.SR2</spring-cloud.version>
 
-        <spotify-docker.version>1.0.0</spotify-docker.version>
+        <spotify-docker.version>1.1.1</spotify-docker.version>
         <docker.image.prefix>deors</docker.image.prefix>
     </properties>
 
@@ -97,20 +97,13 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>${spotify-docker.version}</version>
                 <configuration>
+                    <dockerDirectory>${project.basedir}</dockerDirectory>
                     <imageName>${docker.image.prefix}/${project.name}</imageName>
-                    <dockerDirectory>src/main/docker</dockerDirectory>
                     <imageTags>
                         <imageTag>${project.version}</imageTag>
                         <imageTag>latest</imageTag>
                     </imageTags>
                     <serverId>docker-hub</serverId>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
                 </configuration>
             </plugin>
         </plugins>
