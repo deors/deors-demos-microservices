@@ -6,7 +6,9 @@ Demonstration of an exemplar microservices stack based in Spring Boot, Spring Cl
 
 This demo is organised in iterations, starting from the basics and building up in complexity and features along the way.
 
-NOTE: The following instructions are created on a Windows machine, hence some commands may need slight adjustments when working on Linux/OSX, e.g. replace `%ENV_VAR%` by `${ENV_VAR}`, and replace back-slashes by forward-slashes.
+NOTE: The following labs are created on a Windows machine, hence some commands may need slight adjustments when working on Linux/OSX, e.g. replace `%ENV_VAR%` by `${ENV_VAR}`, and replace back-slashes by forward-slashes.
+
+NOTE: The following labs have been tested with Spring Boot 1.5.18, the latest 1.x version at the time of publishing this, with Apache Maven 3.6.0 and Java 8.
 
 ## Iteration 1) The basics
 
