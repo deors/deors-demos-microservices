@@ -1,4 +1,4 @@
-FROM frolvlad/alpine-oraclejdk8:slim
+FROM openjdk:8u181-jre
 VOLUME /tmp
-ADD deors-demos-microservices-hystrixservice-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+ADD target/deors-demos-microservices-hystrixservice.jar app.jar
+ENTRYPOINT exec java $JAVA_OPTS -jar /app.jar

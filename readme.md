@@ -551,36 +551,62 @@ Let's proceed with bookrec service as an example. Change to its directory:
 Edit `pom.xml` and add inside `<properties>` the following property:
 
 ```xml
-    <docker.image.prefix>deors</docker.image.prefix>
+    <properties>
+    ...
+        <docker.image.prefix>deors</docker.image.prefix>
+    ...
+    </properties>
 ```
 
-This property will be used to identify the registry organisation where the generated images will be pushed.
+This property will be used to identify the registry organisation where the generated images will be published. Hence, `deors` should be replaced by any organisation name in which there are permissions to publish images.
+
+Add inside `<build>`the following configuration to make the generated Jar file name to not contain the version string. That will help make the Dockerfile not dependant on the artefact version.
+
+```xml
+    <build>
+    ...
+        <finalName>${project.artifactId}</finalName>
+    ...
+    </build>
+```
 
 Add inside `<build><plugins>` Spotify's Docker Maven plug-in configuration:
 
 ```xml
-    <plugin>
-        <groupId>com.spotify</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>1.1.1</version>
-        <configuration>
-            <dockerDirectory>${project.basedir}</dockerDirectory>
-            <imageName>${docker.image.prefix}/${project.name}</imageName>
-            <imageTags>
-                <imageTag>${project.version}</imageTag>
-                <imageTag>latest</imageTag>
-            </imageTags>
-            <serverId>docker-hub</serverId>
-        </configuration>
-    </plugin>
+    <build>
+    ...
+        <plugins>
+        ...
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <configuration>
+                    <dockerDirectory>${project.basedir}</dockerDirectory>
+                    <imageName>${docker.image.prefix}/${project.name}</imageName>
+                    <imageTags>
+                        <imageTag>${project.version}</imageTag>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <serverId>docker-hub</serverId>
+                </configuration>
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
 ```
+
+The server id in Spotify's plug-in configuration must match an existing credential in Maven's settings. This is the credential that will be used to publish new and updates images.
 
 Create the file `Dockerfile` and add the following content:
 
-    FROM frolvlad/alpine-oraclejdk8:slim
+```dockerfile
+    FROM openjdk:8u181-jre
     VOLUME /tmp
-    ADD deors-demos-microservices-bookrecservice-0.0.1-SNAPSHOT.jar app.jar
-    ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+    ADD target/deors-demos-microservices-bookrecservice.jar app.jar
+    ENTRYPOINT exec java $JAVA_OPTS -jar /app.jar
+```
 
 Repeat for the other microservices (don't forget to update Jar file name in ADD command).
 
