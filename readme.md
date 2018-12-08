@@ -606,11 +606,11 @@ Create the file `Dockerfile` and add the following content:
 ```dockerfile
     FROM openjdk:8u181-jre
     VOLUME /tmp
-    ADD target/deors-demos-microservices-bookrecservice.jar app.jar
+    ADD target/bookrecservice.jar app.jar
     ENTRYPOINT exec java $JAVA_OPTS -jar /app.jar
 ```
 
-Repeat for the other microservices (don't forget to update Jar file name in ADD command).
+Repeat for the other microservices. Don't forget to update Jar file name in ADD command, using for each one the `artifactId`, matching the configured `finalName` in `pom.xml`.
 
 ### 2.4) Create the images
 
