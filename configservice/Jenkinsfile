@@ -36,8 +36,9 @@ pipeline {
 
         stage('Mutation tests') {
             steps {
-                echo "-=- execute mutation tests -=-"
-                sh "./mvnw org.pitest:pitest-maven:mutationCoverage"
+                echo "-=- skipped as there are no unit tests -=-"
+                //echo "-=- execute mutation tests -=-"
+                //sh "./mvnw org.pitest:pitest-maven:mutationCoverage"
             }
         }
 
