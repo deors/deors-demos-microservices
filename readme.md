@@ -582,7 +582,7 @@ Add inside `<build><plugins>` Spotify's Docker Maven plug-in configuration:
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.1.1</version>
+                <version>1.2.0</version>
                 <configuration>
                     <dockerDirectory>${project.basedir}</dockerDirectory>
                     <imageName>${docker.image.prefix}/${project.name}</imageName>
