@@ -27,17 +27,15 @@
 
         <spring-cloud.version>Edgware.SR2</spring-cloud.version>
 
-        <jmockit.version>1.43</jmockit.version>
-        <jacoco.version>0.8.2</jacoco.version>
-        <sonarjava.version>5.9.2.16552</sonarjava.version>
-        <selenium.version>3.13.0</selenium.version>
-        <htmlunit.version>2.29.0</htmlunit.version>
-        <pitest.version>1.4.3</pitest.version>
-        <jmeter.version>2.6.0</jmeter.version>
+        <jmockit.version>1.45</jmockit.version>
+        <jacoco.version>0.8.3</jacoco.version>
+        <sonarjava.version>5.10.2.17019</sonarjava.version>
+        <pitest.version>1.4.5</pitest.version>
+        <jmeter.version>2.8.5</jmeter.version>
         <dependency-check.version>3.3.2</dependency-check.version>
 
         <jmockit.path>${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar</jmockit.path>
-        <jmockit.utAgentConfig>-javaagent:${jmockit.path}</jmockit.utAgentConfig>
+        <jmockit.agentConfig>-javaagent:${jmockit.path}</jmockit.agentConfig>
 
         <jacoco.path>${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar</jacoco.path>
         <jacoco.utReport>${project.build.directory}/jacoco.exec</jacoco.utReport>
@@ -45,10 +43,10 @@
         <jacoco.utAgentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.utReport}</jacoco.utAgentConfig>
         <jacoco.itAgentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.itReport}</jacoco.itAgentConfig>
 
-        <compiler.version>3.7.0</compiler.version>
+        <compiler.version>3.8.0</compiler.version>
         <surefire.version>2.22.1</surefire.version>
         <failsafe.version>2.22.1</failsafe.version>
-        <dependency.version>3.0.2</dependency.version>
+        <dependency.version>3.1.1</dependency.version>
 
         <spotify-docker.version>1.2.0</spotify-docker.version>
         <docker.image.prefix>deors</docker.image.prefix>
@@ -167,9 +165,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <argLine>${jmockit.utAgentConfig} ${jacoco.utAgentConfig}</argLine>
+                    <argLine>${jmockit.agentConfig} ${jacoco.utAgentConfig}</argLine>
                     <excludes>
-                        <exclude>**/*IntegrationTestCase.java</exclude>
+                        <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
                     <properties>
                         <!-- add SonarQube's JaCoCo listener to enable -->
@@ -182,26 +180,17 @@
                 </configuration>
             </plugin>
 
-            <!-- integration tests (with mocking and code coverage agents enabled) -->
+            <!-- integration tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${failsafe.version}</version>
                 <configuration>
-                    <!-- JaCoCo must be enabled also on target app container
-                         for tests running there, e.g. UI tests and API tests -->
-                    <argLine>${jmockit.utAgentConfig} ${jacoco.itAgentConfig}</argLine>
+                    <!-- JaCoCo must be enabled on target app container to gather coverage
+                         for integration tests, e.g. UI tests and API tests -->
                     <includes>
-                        <include>**/*IntegrationTestCase.java</include>
+                        <include>**/*IntegrationTest.java</include>
                     </includes>
-                    <properties>
-                        <!-- add SonarQube's JaCoCo listener to enable -->
-                        <!-- gathering of code coverage metrics per test -->
-                        <property>
-                            <name>listener</name>
-                            <value>org.sonar.java.jacoco.JUnitListener</value>
-                        </property>
-                    </properties>
                 </configuration>
                 <!-- if activated, will run failsafe automatically on integration-test and verify goals -->
                 <!--<executions>
@@ -221,12 +210,12 @@
                 <version>${pitest.version}</version>
                 <configuration>
                     <jvmArgs>
-                        <value>${jmockit.utAgentConfig}</value>
+                        <value>${jmockit.agentConfig}</value>
                     </jvmArgs>
-                    <excludedTests>
+                    <excludedTestClasses>
                         <param>*ApplicationTests</param>
-                        <param>*IntegrationTestCase</param>
-                    </excludedTests>
+                        <param>*IntegrationTest</param>
+                    </excludedTestClasses>
                     <outputFormats>
                         <outputFormat>XML</outputFormat>
                     </outputFormats>
