@@ -604,7 +604,7 @@ The server id in Spotify's plug-in configuration must match an existing credenti
 Create the file `Dockerfile` and add the following content:
 
 ```dockerfile
-    FROM openjdk:8u181-jre
+    FROM adoptopenjdk/openjdk8:jdk8u202-b08
     VOLUME /tmp
     ADD target/bookrecservice.jar app.jar
     ENTRYPOINT exec java $JAVA_OPTS -jar /app.jar
