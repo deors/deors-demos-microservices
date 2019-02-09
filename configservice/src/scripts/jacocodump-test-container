@@ -1,0 +1,2 @@
+#!/bin/bash
+java -jar target/dependency/jacococli.jar dump --address ci-deors-demos-microservices-configservice --port 6300 --destfile target/jacoco-it.exec

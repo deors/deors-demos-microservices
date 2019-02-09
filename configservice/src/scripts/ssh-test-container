@@ -1,0 +1,2 @@
+#!/bin/bash
+docker exec -it ci-deors-demos-microservices-configservice /bin/bash
