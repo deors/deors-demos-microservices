@@ -6,7 +6,7 @@
 
     <groupId>deors.demos.microservices</groupId>
     <artifactId>bookrecedgeservice</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>deors-demos-microservices-bookrecedgeservice</name>
