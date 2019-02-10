@@ -26,8 +26,11 @@ Create the file `application.properties`. This file will contain settings which 
     debug = true
     spring.jpa.generate-ddl = true
     management.security.enabled = false
+    management.endpoints.web.exposure.include = hystrix.stream
 
 The third configuration setting will disable security for actuator endpoints, which allows for remote operations on running applications. Disabling security in this manner should be done only when public access to those endpoints is restricted externally (for example through the web server or reverse proxy). Never expose actuator endpoints publicly and insecurely!
+
+The fourth configuration setting will expose the hystrix.stream actuator endpoint via http, which will allow Hystrix (see later) to monitor performance of individual services.
 
 Next, we will add the setting for all microservices. These settings may not be obvious now, but they will later once they are needed.
 
@@ -148,6 +151,29 @@ First, let's modify `pom.xml` file to upgrade the Java version to 11:
         <java.version>11</java.version>
     ...
     </properties>
+```
+
+When using Java 9+, Spring Boot does not add JAX-B module (java.xml.bind) to Tomcat module path automatically, causing service registry service to fail on startup. In that case, the missing module should be added to Tomcat module path. When using `spring-boot:run` Maven goal to run the application, use the `JDK_JAVA_OPTIONS` environment variable:
+
+    set JDK_JAVA_OPTIONS=--add-modules java.xml.bind
+    mvnw spring-boot:run
+
+Or, when executing the fat Jar directly:
+
+    java -jar target/<name-of-the-fat.jar> --add-modules java.xml.bind
+
+But the preferred way to fix this is directly in `pom.xml` file.
+
+```xml
+    <dependencies>
+    ...
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+    ...
+    </dependencies>
 ```
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
@@ -494,7 +520,7 @@ To verify that Hystrix fault tolerance mechanism is working as expected, stop th
 
 Go back to Hystrix dashboard and start monitoring the book recommendation edge service by registering the bookrec Hystrix stream in the dashboard (and optionally configuring the delay and page title):
 
-     http://localhost:8181/hystrix.stream
+     http://localhost:8181/actuator/hystrix.stream
 
 Once the Hystric stream is registered, try again to access the edge service, with and without the inner service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
 
@@ -742,7 +768,7 @@ To verify that Hystrix fault tolerance mechanism is working as expected, stop th
 
 Go back to Hystrix dashboard and start monitoring the book recommendation edge service by registering the bookrec Hystrix stream in the dashboard (and optionally configuring the delay and page title):
 
-     http://192.168.66.100:8181/hystrix.stream
+     http://192.168.66.100:8181/actuator/hystrix.stream
 
 Once the Hystric stream is registered, try again to access the edge service, with and without the inner service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
 
