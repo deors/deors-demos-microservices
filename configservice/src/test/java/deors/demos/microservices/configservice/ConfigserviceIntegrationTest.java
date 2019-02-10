@@ -1,11 +1,10 @@
 package deors.demos.microservices.configservice;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Assume;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -21,7 +20,7 @@ public class ConfigserviceIntegrationTest {
 
     protected static String TARGET_SERVER_URL;
 
-    @BeforeClass
+    @BeforeAll
     public static void initEnvironment() {
 
         TARGET_SERVER_URL = getConfigurationProperty(
@@ -70,11 +69,11 @@ public class ConfigserviceIntegrationTest {
             TARGET_SERVER_URL + "actuator/health",
             HttpMethod.GET, entity, String.class);
 
-        assertEquals("call to /actuator/health should respond with code 200",
-            HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode(),
+            "call to /actuator/health should respond with code 200");
 
-        assertTrue("actuator health endpoint should confirm that the service is up",
-            response.getBody().contains("\"status\":\"UP\""));
+        assertTrue(response.getBody().contains("\"status\":\"UP\""),
+            "actuator health endpoint should confirm that the service is up");
     }
 
     @Test
@@ -89,13 +88,13 @@ public class ConfigserviceIntegrationTest {
             TARGET_SERVER_URL + "bookrecservice/default",
             HttpMethod.GET, entity, String.class);
 
-        assertEquals("call to /bookrecservice/default should respond with code 200",
-            HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode(),
+            "call to /bookrecservice/default should respond with code 200");
 
-        assertTrue("config should contain the key with the right Spring Boot app name",
-            response.getBody().contains("\"name\":\"bookrecservice\""));
+        assertTrue(response.getBody().contains("\"name\":\"bookrecservice\""),
+            "config should contain the key with the right Spring Boot app name");
 
-        assertTrue("config should contain the key with the default HTTP port for the service",
-            response.getBody().contains("\"server.port\":\"${PORT:8080}\""));
+        assertTrue(response.getBody().contains("\"server.port\":\"${PORT:8080}\""),
+            "config should contain the key with the default HTTP port for the service");
     }
 }
