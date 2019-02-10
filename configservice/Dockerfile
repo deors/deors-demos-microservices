@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk8:jdk8u202-b08
+FROM adoptopenjdk/openjdk11:jdk-11.0.2.9
 VOLUME /tmp
 ADD target/dependency/jacocoagent.jar jacocoagent.jar
 ADD target/configservice.jar app.jar

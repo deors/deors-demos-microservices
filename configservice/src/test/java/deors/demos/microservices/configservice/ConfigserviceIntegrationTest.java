@@ -67,14 +67,14 @@ public class ConfigserviceIntegrationTest {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            TARGET_SERVER_URL + "env",
+            TARGET_SERVER_URL + "actuator/health",
             HttpMethod.GET, entity, String.class);
 
-        assertEquals("call to /env should respond with code 200",
+        assertEquals("call to /actuator/health should respond with code 200",
             HttpStatus.OK, response.getStatusCode());
 
-        assertTrue("environment should contain the key with the right Spring Boot app name",
-            response.getBody().contains("\"spring.application.name\":\"configservice\""));
+        assertTrue("actuator health endpoint should confirm that the service is up",
+            response.getBody().contains("\"status\":\"UP\""));
     }
 
     @Test

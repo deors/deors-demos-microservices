@@ -8,7 +8,7 @@ This demo is organised in iterations, starting from the basics and building up i
 
 NOTE: The following labs are created on a Windows machine, hence some commands may need slight adjustments when working on Linux/OSX, e.g. replace `%ENV_VAR%` by `${ENV_VAR}`, and replace back-slashes by forward-slashes.
 
-NOTE: The following labs have been tested with Spring Boot 1.5.18, the latest 1.x version at the time of publishing this, with Apache Maven 3.6.0 and Java 8.
+NOTE: The following labs have been tested with Spring Boot 2.1.2, Apache Maven 3.6.0 and Java 11.0.2, the latest versions of them available at the time of publishing this.
 
 ## Iteration 1) The basics
 
@@ -92,6 +92,16 @@ Change into extracted directory:
 
     cd %HOME%\microservices\configservice
 
+First, let's modify `pom.xml` file to upgrade the Java version to 11:
+
+```xml
+    <properties>
+    ...
+        <java.version>11</java.version>
+    ...
+    </properties>
+```
+
 Next, let's add the application name and set the configuration store location. Edit `src\main\resources\application.properties`:
 
     server.port = ${PORT:8888}
@@ -130,6 +140,16 @@ Change into extracted directory:
 
     cd %HOME%\microservices\eurekaservice
 
+First, let's modify `pom.xml` file to upgrade the Java version to 11:
+
+```xml
+    <properties>
+    ...
+        <java.version>11</java.version>
+    ...
+    </properties>
+```
+
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
     ren src\main\resources\application.properties bootstrap.properties
@@ -166,6 +186,16 @@ Extract the generated zip to:
 Change into extracted directory:
 
     cd %HOME%\microservices\hystrixservice
+
+First, let's modify `pom.xml` file to upgrade the Java version to 11:
+
+```xml
+    <properties>
+    ...
+        <java.version>11</java.version>
+    ...
+    </properties>
+```
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
@@ -208,6 +238,16 @@ Extract the generated zip to:
 Change into extracted directory:
 
     cd %HOME%\microservices\bookrecservice
+
+First, let's modify `pom.xml` file to upgrade the Java version to 11:
+
+```xml
+    <properties>
+    ...
+        <java.version>11</java.version>
+    ...
+    </properties>
+```
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
@@ -316,6 +356,16 @@ Change into extracted directory:
 
     cd %HOME%\microservices\bookrecedgeservice
 
+First, let's modify `pom.xml` file to upgrade the Java version to 11:
+
+```xml
+    <properties>
+    ...
+        <java.version>11</java.version>
+    ...
+    </properties>
+```
+
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
     ren src\main\resources\application.properties bootstrap.properties
@@ -399,17 +449,6 @@ Alternatively, the Spring Boot fat Jar can be created and executed directly:
     mvnw package
     java -jar target/<name-of-the-fat.jar>
 
-When using Java 9+, Spring Boot does not add JAX-B module (java.xml.bind) to Tomcat module path automatically, causing some services to fail on startup. In that case, the missing module should be added to Tomcat module path. When using `spring-boot:run` Maven goal to run the application, use the `JDK_JAVA_OPTIONS` environment variable:
-
-    set JDK_JAVA_OPTIONS=--add-modules java.xml.bind
-    mvnw spring-boot:run
-
-When executing the fat Jar directly:
-
-    java -jar target/<name-of-the-fat.jar> --add-modules java.xml.bind
-
-The module path might also be configured in `pom.xml` file.
-
 Follow the next sequence for running the services in order so they are able to leverage the configuration and registry services during startup:
 
     - configservice
@@ -422,10 +461,9 @@ Follow the next sequence for running the services in order so they are able to l
 
 Once all the services are started, they will be available at the defined ports in the local host.
 
-Access the configuration service through some of the actuator endpoints (remember they are currently unsecured):
+Access the configuration service through the actuator health endpoint (remember it is currently unsecured), to verify it is up & running and responding to requests normally:
 
-    http://localhost:8888/health
-    http://localhost:8888/env
+    http://localhost:8888/actuator/health
 
 Check that the configuration service is capable of returning the configuration for some of the services:
 
@@ -604,7 +642,7 @@ The server id in Spotify's plug-in configuration must match an existing credenti
 Create the file `Dockerfile` and add the following content:
 
 ```dockerfile
-    FROM adoptopenjdk/openjdk8:jdk8u202-b08
+    FROM adoptopenjdk/openjdk11:jdk-11.0.2.9
     VOLUME /tmp
     ADD target/bookrecservice.jar app.jar
     ENTRYPOINT exec java $JAVA_OPTS -jar /app.jar
@@ -671,10 +709,9 @@ To quickly check whether all services are up and their configuration, use this c
 
 Once all the services are started, they will be available at the defined ports in the local host.
 
-Access the configuration service through some of the actuator endpoints (remember they are currently unsecured):
+Access the configuration service through the actuator health endpoint (remember it is currently unsecured), to verify it is up & running and responding to requests normally:
 
-    http://192.168.66.100:8888/health
-    http://192.168.66.100:8888/env
+    http://localhost:8888/actuator/health
 
 Check that the configuration service is capable of returning the configuration for some of the services:
 
