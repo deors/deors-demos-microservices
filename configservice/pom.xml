@@ -270,7 +270,6 @@
                         <host>${jmeter.target.host}</host>
                         <port>${jmeter.target.port}</port>
                         <root>${jmeter.target.root}</root>
-                        <ownerId>${jmeter.target.ownerId}</ownerId>
                     </propertiesUser>
                 </configuration>
                 <!-- if activated, will run jmeter automatically on integration-test and verify goals -->
