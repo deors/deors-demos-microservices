@@ -39,7 +39,6 @@
         <jacoco.report>${project.build.directory}/jacoco.exec</jacoco.report>
         <jacoco.agentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.report}</jacoco.agentConfig>
 
-        <compiler.version>3.8.0</compiler.version>
         <surefire.version>2.22.1</surefire.version>
         <failsafe.version>2.22.1</failsafe.version>
         <dependency.version>3.1.1</dependency.version>
