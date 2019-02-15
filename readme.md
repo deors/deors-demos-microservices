@@ -162,7 +162,7 @@ Or, when executing the fat Jar directly:
 
     java -jar target/<name-of-the-fat.jar> --add-modules java.xml.bind
 
-But the preferred way to fix this is directly in `pom.xml` file.
+But the preferred way to fix this is directly in `pom.xml` file:
 
 ```xml
     <dependencies>
@@ -663,7 +663,7 @@ Add inside `<build><plugins>` Spotify's Docker Maven plug-in configuration:
     </build>
 ```
 
-The server id in Spotify's plug-in configuration must match an existing credential in Maven's settings. This is the credential that will be used to publish new and updates images.
+The server id in Spotify's plug-in configuration must match an existing credential in Maven's settings. This is the credential that will be used to publish new and updated images.
 
 Create the file `Dockerfile` and add the following content:
 
