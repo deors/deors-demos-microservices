@@ -993,6 +993,48 @@ Although Maven Surefire plug-in is enabled by default, Failsafe, the Surefire tw
 
 In addition to the optional automatic activation of Failsafe, the configuration includes the execution filter: the pattern to recognize which test classes are integration tests vs. unit tests.
 
+### 3.6) Adding performance tests with Apache JMeter
+
+The next addition to the project configuration is the addition of performance tests with Apache JMeter.
+
+Besides the addition of the plugin, and optionally enabling the automatic execution of the plugin targets, the configuration will include three properties that will be injected into the scripts. Those properties - host, port, context root - are needed so the script can be executed regardless of where the application being tested is exposed, which is usually only known at runtime when the container is run:
+
+```xml
+    <build>
+    ...
+        <plugins>
+        ...
+            <!-- performance tests -->
+            <plugin>
+                <groupId>com.lazerycode.jmeter</groupId>
+                <artifactId>jmeter-maven-plugin</artifactId>
+                <version>2.8.5</version>
+                <configuration>
+                    <testResultsTimestamp>false</testResultsTimestamp>
+                    <propertiesUser>
+                        <host>${jmeter.target.host}</host>
+                        <port>${jmeter.target.port}</port>
+                        <root>${jmeter.target.root}</root>
+                    </propertiesUser>
+                </configuration>
+                <!-- if activated, will run jmeter automatically on integration-test and verify goals -->
+                <!-- <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>jmeter</goal>
+                            <goal>results</goal>
+                        </goals>
+                    </execution>
+                </executions> -->
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
+```
+
+
 ## Appendixes
 
 ### Clean up the swarm

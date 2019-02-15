@@ -29,6 +29,7 @@
 
         <junit.version>5.3.2</junit.version>
         <jacoco.version>0.8.3</jacoco.version>
+        <jmeter.version>2.8.5</jmeter.version>
 
         <jacoco.path>${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar</jacoco.path>
         <jacoco.report>${project.build.directory}/jacoco.exec</jacoco.report>
@@ -200,6 +201,31 @@
                         </goals>
                     </execution>
                 </executions>-->
+            </plugin>
+
+            <!-- performance tests -->
+            <plugin>
+                <groupId>com.lazerycode.jmeter</groupId>
+                <artifactId>jmeter-maven-plugin</artifactId>
+                <version>${jmeter.version}</version>
+                <configuration>
+                    <testResultsTimestamp>false</testResultsTimestamp>
+                    <propertiesUser>
+                        <host>${jmeter.target.host}</host>
+                        <port>${jmeter.target.port}</port>
+                        <root>${jmeter.target.root}</root>
+                    </propertiesUser>
+                </configuration>
+                <!-- if activated, will run jmeter automatically on integration-test and verify goals -->
+                <!-- <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>jmeter</goal>
+                            <goal>results</goal>
+                        </goals>
+                    </execution>
+                </executions> -->
             </plugin>
         </plugins>
     </build>
