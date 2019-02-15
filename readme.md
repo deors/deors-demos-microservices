@@ -524,7 +524,7 @@ Go back to Hystrix dashboard and start monitoring the book recommendation edge s
 
 Once the Hystric stream is registered, try again to access the edge service, with and without the inner service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
 
-## Iteration 2) Preparing for Docker and Swarm
+## Iteration 2) Adding Docker images and running services in Docker Swarm
 
 ### 2.1) Set up Swarm
 
@@ -793,6 +793,171 @@ Next, the change is deployed. A label is needed to ensure the new version of 'la
 To check how the change is being deployed, issue this command repeatedly:
 
     docker service ps bookrecservice
+
+## Iteration 3) Configuring continuous integration pipelines with Jenkins
+
+### 3.1) The anatomy of a Jenkins pipeline
+
+TBD
+
+### 3.2) Configuring quality tools along the Maven lifecycle
+
+An effective continuous integration pipeline must have sufficient verification steps as to give confidence in the process. Verification steps will include code inspection, and testing:
+
+Code inspection activities are basically three:
+
+- Gathering of metrics, like: size, complexity, code duplications, and others related with architecture and design implementation.
+- Static code profiling: analysis of sources looking for known patterns that may result in vulnerabilities, reliability issues, performance issues, or affect maintainability.
+- Dependency analysis: analysis of dependency manifests (e.g. those included in `pom.xml` or `require.js` files), looking for known vulnerabilities in those dependencies, as published in well-known databases like CVE.
+
+Testing activities will include the following:
+
+- Unit tests.
+- Unit-integration tests: Those that, although not requiring the application to be deployed, are testing multiple components together. For example, in-container tests.
+- Integration tests: Including in this group all those kinds of tests that require the application to be deployed. Typically external dependencies will be mocked up in this step. Integration tests will include API tests and UI tests.
+- Performance tests: Tests verifying how the service or component behaves under load. Performance tests in this step are not meant to assess the overall system capacity (which can be virtually infinite with the appropriate scaling patterns), but to assess the capacity of one node, uncover concurrence issues due to the parallel execution of tasks, as well as to pinpoint possible bottlenecks or resource leaks when studying the trend. Very useful at this step to leverage APM tools to gather internal JVM metrics, e.g. to analyze gargabe collection.
+- Security tests: Tests assessing possible vulnerabilities exposed by the application. In this step, the kind of security tests performed are typically DAST analysis.
+
+In addition to the previous kinds of tests, there is one more which is meant to assess the quality of tests: Mutation tests. Mutation testing, usually executed only on unit tests for the sake of execution time, is a technique that identifies changes in source code, the so called mutations, applies them and re-execute the corresponding unit tests. If after a change in the source code, unit tests do not fail, that means that either the test code does not have assertions, or there are assertions but test coverage is unsufficient (typically test cases with certain conditions not tested).
+
+To enable these tools along the lifecycle, and to align developer workstation usage with CI server pipeline usage, the recommended approach is to configure these activities with the appropriate tools in Maven's `pom.xml`, storing the corresponding test scripts, data and configuration, along with the source code in the `src/test` folder (very commonly done for unit tests, and also recommended for the other kinds of tests).
+
+### 3.3) Upgrading JUnit to version 5
+
+Unit tests are already configured by default in Spring Boot thanks to the addition of the `spring-boot-starter-test` dependency. Unit tests are configured to run with JUnit 4, so we will upgrade the configuration to leverage JUnit 5.
+
+To enable JUnit 5, it is needed to suppress the dependency on JUnit 4, and add the newer version to `pom.xml`:
+
+```xml
+    <dependencies>
+    ...
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <!-- exclude JUnit 4 in favour of JUnit 5 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
+        </dependency>
+    ...
+    </dependencies>
+```
+
+### 3.4) Adding JaCoCo agent to gather code coverage metrics during tests
+
+One of the actions to be done along the pipeline, is to enable code coverage metrics when unit tests and integration tests are executed. To do that, there are a few actions needed in preparation for the task.
+
+First, the JaCoCo agent must be added as a Maven dependency in `pom.xml`:
+
+```xml
+    <dependencies>
+    ...
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.agent</artifactId>
+            <version>0.8.3</version>
+            <classifier>runtime</classifier>
+            <scope>test</scope>
+        </dependency>
+    ...
+    </dependencies>
+```
+
+To enable the gathering of code coverage metrics during unit tests, the agent provides a goal to prepare the needed JVM argument. Another possible approach, to ensure that the agent is always enabled, is to pass the JVM argument directly to Surefire plugin:
+
+```xml
+    <build>
+    ...
+        <plugins>
+        ...
+            <!-- unit tests (with code coverage agent enabled) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+                <configuration>
+                    <argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/0.8.3/org.jacoco.agent-0.8.3-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
+```
+
+For integration tests, the code coverage setup is a bit more complicated. Instead of enabling the agent in the test executor, it is the test server the process that must have the agent enabled. The former approach works for unit tests because the same JVM process holds both the test code and the code for the application being tested. However for integration tests, the test execution is a separate process from the application being tested.
+
+As the application is packaged and runs as a Docker image, the agent file must be present at the image build time. Later, during the execution of integration tests, the JaCoCo CLI tool will be needed to dump the coverage data from the test server. To do that, both dependencies will be copied into the expected folder with the help of the Maven Dependency plug-in:
+
+```xml
+    <build>
+    ...
+        <plugins>
+        ...
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jacoco</groupId>
+                                    <artifactId>org.jacoco.agent</artifactId>
+                                    <version>0.8.3</version>
+                                    <classifier>runtime</classifier>
+                                    <destFileName>jacocoagent.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.jacoco</groupId>
+                                    <artifactId>org.jacoco.cli</artifactId>
+                                    <version>0.8.3</version>
+                                    <classifier>nodeps</classifier>
+                                    <destFileName>jacococli.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
+```
+
+And finally, the JaCoCo agent needs to be copied into the Docker image. Edit the file `Dockerfile` and add a new `ADD` instruction after `VOLUME`:
+
+```dockerfile
+    ...
+    VOLUME /tmp
+    ADD target/dependency/jacocoagent.jar jacocoagent.jar
+    ...
+```
 
 ## Appendixes
 
