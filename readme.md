@@ -1034,6 +1034,31 @@ Besides the addition of the plugin, and optionally enabling the automatic execut
     </build>
 ```
 
+### 3.7) Configuring dependency vulnerability tests with OWASP
+
+OWASP is a global organization focused on secure development practices. OWASP also owns several open source tools, including OWASP Dependency Check. Dependency Check scans dependencies from a project manifest, like the `pom.xml` file, and checks them with the online repository of known vulnerabilities (CVE, maintained by NIST), for every framework artefact, and version.
+
+To ensure that unsecure vulnerabilities are not carried onto a live environment, the configuration will include the setting to fail builds in case of vulnerabilities detected of higher severity:
+
+```xml
+    <build>
+    ...
+        <plugins>
+        ...
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <format>ALL</format>
+                    <failBuildOnCVSS>5</failBuildOnCVSS>
+                </configuration>
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
+```
 
 ## Appendixes
 
