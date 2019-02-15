@@ -835,7 +835,6 @@ To enable JUnit 5, it is needed to suppress the dependency on JUnit 4, and add t
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <!-- exclude JUnit 4 in favour of JUnit 5 -->
             <exclusions>
                 <exclusion>
                     <groupId>junit</groupId>
@@ -886,7 +885,6 @@ To enable the gathering of code coverage metrics during unit tests, the agent pr
     ...
         <plugins>
         ...
-            <!-- unit tests (with code coverage agent enabled) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -958,6 +956,42 @@ And finally, the JaCoCo agent needs to be copied into the Docker image. Edit the
     ADD target/dependency/jacocoagent.jar jacocoagent.jar
     ...
 ```
+
+### 3.5) Configuring Failsafe for integration test execution
+
+Although Maven Surefire plug-in is enabled by default, Failsafe, the Surefire twin for integration tests, is disabled by default. To enable Failsafe, its targets must be called explicitely or alternatively may be binded to the corresponding lifecycle goals. For the microservices pipeline is preferred to have it disabled by default:
+
+```xml
+    <build>
+    ...
+        <plugins>
+        ...
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.1</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                </configuration>
+                <!-- if activated, will run failsafe automatically on integration-test and verify goals -->
+                <!--<executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
+```
+
+In addition to the optional automatic activation of Failsafe, the configuration includes the execution filter: the pattern to recognize which test classes are integration tests vs. unit tests.
 
 ## Appendixes
 

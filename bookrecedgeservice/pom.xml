@@ -35,6 +35,7 @@
         <jacoco.agentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.report}</jacoco.agentConfig>
 
         <surefire.version>2.22.1</surefire.version>
+        <failsafe.version>2.22.1</failsafe.version>
 
         <spotify-docker.version>1.2.0</spotify-docker.version>
         <docker.image.prefix>deors</docker.image.prefix>
@@ -189,6 +190,29 @@
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <!-- integration tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${failsafe.version}</version>
+                <configuration>
+                    <!-- JaCoCo must be enabled on target app container to gather coverage
+                         for integration tests, e.g. UI tests and API tests -->
+                    <includes>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                </configuration>
+                <!-- if activated, will run failsafe automatically on integration-test and verify goals -->
+                <!--<executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
             </plugin>
         </plugins>
     </build>
