@@ -36,10 +36,8 @@
         <dependency-check.version>3.3.2</dependency-check.version>
 
         <jacoco.path>${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar</jacoco.path>
-        <jacoco.utReport>${project.build.directory}/jacoco.exec</jacoco.utReport>
-        <jacoco.itReport>${project.build.directory}/jacoco-it.exec</jacoco.itReport>
-        <jacoco.utAgentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.utReport}</jacoco.utAgentConfig>
-        <jacoco.itAgentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.itReport}</jacoco.itAgentConfig>
+        <jacoco.report>${project.build.directory}/jacoco.exec</jacoco.report>
+        <jacoco.agentConfig>-javaagent:${jacoco.path}=destfile=${jacoco.report}</jacoco.agentConfig>
 
         <compiler.version>3.8.0</compiler.version>
         <surefire.version>2.22.1</surefire.version>
@@ -170,13 +168,13 @@
                 </configuration>
             </plugin>
 
-            <!-- unit tests (with mocking and code coverage agents enabled) -->
+            <!-- unit tests (with code coverage agent enabled) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <argLine>${jacoco.utAgentConfig}</argLine>
+                    <argLine>${jacoco.agentConfig}</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
