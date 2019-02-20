@@ -12,5 +12,4 @@ public class ConfigserviceApplicationTests {
     @Test
     public void contextLoads() {
     }
-
 }
