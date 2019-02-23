@@ -3,5 +3,5 @@ docker run --name ci-deors-demos-microservices-configservice \
   --detach --rm \
   --network ci \
   --publish 8888:8888 --publish 6300:6300 \
-  --env JAVA_OPTS="-javaagent:/jacocoagent.jar=output=tcpserver,address=*,port=6300" \
+  --env JAVA_OPTS="-Dserver.port=8888 -Dspring.profiles.active=ci -javaagent:/jacocoagent.jar=output=tcpserver,address=*,port=6300" \
   deors/deors-demos-microservices-configservice:latest

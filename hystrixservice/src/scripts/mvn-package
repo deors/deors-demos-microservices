@@ -1,0 +1,2 @@
+#!/bin/bash
+./mvnw -s ~/.m2/settings.xml clean package docker:build

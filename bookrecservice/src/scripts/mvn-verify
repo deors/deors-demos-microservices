@@ -1,0 +1,2 @@
+#!/bin/bash
+./mvnw failsafe:integration-test failsafe:verify -DargLine="-Dtest.target.server.url=http://localhost:8080/"

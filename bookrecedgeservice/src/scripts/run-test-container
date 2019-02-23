@@ -1,0 +1,7 @@
+#!/bin/bash
+docker run --name ci-deors-demos-microservices-bookrecedgeservice \
+  --detach --rm \
+  --network ci \
+  --publish 8181:8181 --publish 6300:6300 \
+  --env JAVA_OPTS="-Dserver.port=8181 -Dspring.profiles.active=ci -javaagent:/jacocoagent.jar=output=tcpserver,address=*,port=6300" \
+  deors/deors-demos-microservices-bookrecedgeservice:latest
