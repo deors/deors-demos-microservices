@@ -7,3 +7,4 @@ insert into book(id, title, author) values (6, 'blood of elves', 'andrzej sapkow
 insert into book(id, title, author) values (7, 'harry potter and the prisoner of azkaban', 'j.k. rowling')
 insert into book(id, title, author) values (8, '2010: odyssey two', 'arthur c. clarke')
 insert into book(id, title, author) values (9, 'starship troopers', 'robert a. heinlein')
+insert into book(id, title, author) values (10, 'lady of the lake', 'andrzej sapkowski')
