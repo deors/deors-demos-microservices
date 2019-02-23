@@ -462,6 +462,16 @@ public class BookController {
 }
 ```
 
+At this point, executing a `mvn test` command ends in failure, as the default properties which values are autowired cannot be found by Spring while executing the application tests. Once all services are running, this will not be an issue as those properties will be provided by the configuration server, but there should be an alternate way to locate those values at test time.
+
+For that, it is possible to add an application properties file in the test folder, specifically `src/test/resources/application.properties`. In this file, the properties needed to run the tests should be added:
+
+    defaultBookId = -1
+    defaultBookTitle = robots of dawn [test]
+    defaultBookAuthor = isaac asimov [test]
+
+It is also a good idea to add a 'flag' to let it be obvious that the property values are defined in the test application properties file.
+
 ### 1.7) Run the services locally
 
 Services are now ready to be executed locally, using the sensible default configuration settings and the embedded runtimes provided by Spring Boot.
