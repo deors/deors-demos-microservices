@@ -29,6 +29,8 @@
 
         <junit.version>5.3.2</junit.version>
         <jacoco.version>0.8.3</jacoco.version>
+        <pitest.version>1.4.5</pitest.version>
+        <pitest-junit5.version>0.8</pitest-junit5.version>
         <jmeter.version>2.8.5</jmeter.version>
         <dependency-check.version>3.3.2</dependency-check.version>
 
@@ -213,6 +215,38 @@
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
+            </plugin>
+
+            <!-- mutation tests -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <configuration>
+                    <excludedTestClasses>
+                        <param>*ApplicationTests</param>
+                        <param>*IntegrationTest</param>
+                    </excludedTestClasses>
+                    <outputFormats>
+                        <outputFormat>XML</outputFormat>
+                    </outputFormats>
+                </configuration>
+                <!-- enable support for JUnit 5 in Pitest -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <!-- if activated, will run pitest automatically on integration-test goal -->
+                <!--<executions>
+                    <execution>
+                        <goals>
+                            <goal>mutationCoverage</goal>
                         </goals>
                     </execution>
                 </executions>-->

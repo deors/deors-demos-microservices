@@ -1097,7 +1097,57 @@ Besides the addition of the plugin, and optionally enabling the automatic execut
 
 TBD
 
-### 3.10) Configuring dependency vulnerability tests with OWASP
+### 3.10) Configuring mutation testing
+
+The next step is to configure mutation testing with Pitest.
+
+As mutation testing works better with strict unit tests, the plugin configuration should exclude application (in-container) tests and integration tests. If left enabled, mutation testing is likely to take a very long time to finish, and results obtained are likely to not be useful at all.
+
+```xml
+    <build>
+    ...
+        <plugins>
+        ...
+            <!-- mutation tests -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.4.5</version>
+                <configuration>
+                    <excludedTestClasses>
+                        <param>*ApplicationTests</param>
+                        <param>*IntegrationTest</param>
+                    </excludedTestClasses>
+                    <outputFormats>
+                        <outputFormat>XML</outputFormat>
+                    </outputFormats>
+                </configuration>
+                <!-- enable support for JUnit 5 in Pitest -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>0.8</version>
+                    </dependency>
+                </dependencies>
+                <!-- if activated, will run pitest automatically on integration-test goal -->
+                <!--<executions>
+                    <execution>
+                        <goals>
+                            <goal>mutationCoverage</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
+            </plugin>
+        ...
+        </plugins>
+    ...
+    </build>
+```
+
+Due to how Pitest plugin works, it will fail when there are no mutable tests i.e. no strict unit tests. Considering this, the pipelines corresponding to services without mutable tests should skip the execution of Pitest.
+
+### 3.11) Configuring dependency vulnerability tests with OWASP
 
 OWASP is a global organization focused on secure development practices. OWASP also owns several open source tools, including OWASP Dependency Check. Dependency Check scans dependencies from a project manifest, like the `pom.xml` file, and checks them with the online repository of known vulnerabilities (CVE, maintained by NIST), for every framework artefact, and version.
 
@@ -1123,7 +1173,7 @@ To ensure that unsecure vulnerabilities are not carried onto a live environment,
     </build>
 ```
 
-### 3.11) Orchestrating the build - the continuous integration pipeline
+### 3.12) Orchestrating the build - the continuous integration pipeline
 
 TBD
 
