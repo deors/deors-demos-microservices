@@ -173,6 +173,11 @@ But the preferred way to fix this is directly in `pom.xml` file:
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.1</version>
+        </dependency>
     ...
     </dependencies>
 ```
