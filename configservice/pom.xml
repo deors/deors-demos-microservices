@@ -278,7 +278,7 @@
                     <failBuildOnCVSS>4</failBuildOnCVSS>
                 </configuration>
             </plugin>
-		</plugins>
+        </plugins>
     </build>
 
 </project>
