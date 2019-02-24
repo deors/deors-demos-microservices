@@ -428,7 +428,9 @@ Create the Book bean for the edge service, which is analogous to the Book bean f
 public class Book {
 
     private Long id;
+
     private String title;
+
     private String author;
 }
 ```
@@ -448,11 +450,16 @@ import org.springframework.web.client.RestTemplate;
 public class BookController {
 
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
-    @Value("${defaultBookId}") private long defaultBookId;
-    @Value("${defaultBookTitle}") private String defaultBookTitle;
-    @Value("${defaultBookAuthor}") private String defaultBookAuthor;
+    @Value("${defaultBookId}")
+    private long defaultBookId;
+
+    @Value("${defaultBookTitle}")
+    private String defaultBookTitle;
+
+    @Value("${defaultBookAuthor}")
+    private String defaultBookAuthor;
 
     @RequestMapping("/bookrecedge")
     @com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand(fallbackMethod = "getDefaultBook")

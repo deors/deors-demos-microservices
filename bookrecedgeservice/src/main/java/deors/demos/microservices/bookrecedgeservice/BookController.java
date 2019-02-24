@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 public class BookController {
 
     @Autowired
-    RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     @Value("${defaultBookId}")
     private long defaultBookId;
