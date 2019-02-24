@@ -26,11 +26,11 @@ Create the file `application.properties`. This file will contain settings which 
     debug = true
     spring.jpa.generate-ddl = true
     management.security.enabled = false
-    management.endpoints.web.exposure.include = hystrix.stream
+    management.endpoints.web.exposure.include = *
 
 The third configuration setting will disable security for actuator endpoints, which allows for remote operations on running applications. Disabling security in this manner should be done only when public access to those endpoints is restricted externally (for example through the web server or reverse proxy). Never expose actuator endpoints publicly and insecurely!
 
-The fourth configuration setting will expose the hystrix.stream actuator endpoint via http, which will allow Hystrix (see later) to monitor performance of individual services.
+The fourth configuration setting will expose all actuator endpoint via http, which will allow us to easily inspect and monitor each service, including the endpoint used by Hystrix (see later) to monitor performance of individual services.
 
 Next, we will add the setting for all microservices. These settings may not be obvious now, but they will later once they are needed.
 
@@ -111,6 +111,7 @@ Next, let's add the application name and set the configuration store location. E
     spring.application.name = configservice
     spring.cloud.config.server.git.uri = ${CONFIG_REPO_URL:https://github.com/deors/deors-demos-microservices-configstore.git}
     management.security.enabled = false
+    management.endpoints.web.exposure.include = *
 
 If the configuration store is local, leverage the File protocol in Git:
 
