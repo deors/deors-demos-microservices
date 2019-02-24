@@ -12,9 +12,14 @@ public class BookController {
     @Autowired
     RestTemplate restTemplate;
 
-    @Value("${defaultBookId}") private long defaultBookId;
-    @Value("${defaultBookTitle}") private String defaultBookTitle;
-    @Value("${defaultBookAuthor}") private String defaultBookAuthor;
+    @Value("${defaultBookId}")
+    private long defaultBookId;
+
+    @Value("${defaultBookTitle}")
+    private String defaultBookTitle;
+
+    @Value("${defaultBookAuthor}")
+    private String defaultBookAuthor;
 
     @RequestMapping("/bookrecedge")
     @com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand(fallbackMethod = "getDefaultBook")
