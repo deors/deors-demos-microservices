@@ -211,7 +211,7 @@
                 </executions>-->
             </plugin>
 
-            <!-- mutation tests (with mocking agent enabled) -->
+            <!-- mutation tests -->
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
