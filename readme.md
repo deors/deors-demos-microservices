@@ -10,6 +10,8 @@ NOTE: The following labs are created on a Linux/OSX machine, hence some commands
 
 NOTE: The following labs have been tested with Spring Boot 2.1.3, Apache Maven 3.6.0 and Java 11.0.2, the latest versions of them available at the time of publishing this.
 
+HISTORY NOTES: This demonstration and guideline was first featured in a live coding session in OpenSlava 2016 conference, in the beautiful city of Bratislava, and the pipelines lesson was first presented in Oracle Code One San Francisco 2018 conference.
+
 ## Iteration 1) The basics
 
 ### 1.1) Set up the configuration store
