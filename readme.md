@@ -1641,7 +1641,7 @@ If desired, the swarm can be disposed, too, by removing all the machines include
 
     docker-machine rm docker-swarm-manager-1 docker-swarm-manager-2 docker-swarm-manager-3 docker-swarm-worker-1 docker-swarm-worker-2 docker-swarm-worker-3
 
-### Launching Jenkins and SonarQube
+### Launching Jenkins and SonarQube
 
 Both Jenkins and SonarQube servers are required for running the pipelines and code inspection. Although there are many ways to have Jenkins and SonarQube up and running, this is probably the easiest, fastest one -- running them as Docker containers:
 
