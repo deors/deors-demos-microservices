@@ -6,7 +6,7 @@ Demonstration of an exemplar microservices stack based in Spring Boot, Spring Cl
 
 This demo is organised in iterations, starting from the basics and building up in complexity and features along the way.
 
-NOTE: The following labs are created on a Windows machine, hence some commands may need slight adjustments when working on Linux/OSX, e.g. replace `%ENV_VAR%` by `${ENV_VAR}`, and replace back-slashes by forward-slashes.
+NOTE: The following labs are created on a Linux/OSX machine, hence some commands may need slight adjustments when working on Windows, e.g. replace `${ENV_VAR}` by `%ENV_VAR%`, and replace forward-slashes by back-slashes (although in some commands Windows also understand forward-slashes).
 
 NOTE: The following labs have been tested with Spring Boot 2.1.2, Apache Maven 3.6.0 and Java 11.0.2, the latest versions of them available at the time of publishing this.
 
@@ -18,8 +18,8 @@ The configuration store is a repository where microservice settings are stored, 
 
 Create and change to a directory for the project:
 
-    mkdir %HOME%\microservices\configstore
-    cd %HOME%\microservices\configstore
+    mkdir ~/microservices/configstore
+    cd ~/microservices/configstore
 
 Create the file `application.properties`. This file will contain settings which are common to all microservices:
 
@@ -89,11 +89,11 @@ The actuator depedency, when added, enables useful endpoints to facilitate appli
 
 Extract the generated zip to:
 
-    %HOME%\microservices
+    ~/microservices
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\configservice
+    cd ~/microservices/configservice
 
 First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
@@ -105,7 +105,7 @@ First, let's modify `pom.xml` file to upgrade the Java version to 11:
     </properties>
 ```
 
-Next, let's add the application name and set the configuration store location. Edit `src\main\resources\application.properties`:
+Next, let's add the application name and set the configuration store location. Edit `src/main/resources/application.properties`:
 
     server.port = ${PORT:8888}
     spring.application.name = configservice
@@ -117,7 +117,7 @@ If the configuration store is local, leverage the File protocol in Git:
 
     spring.cloud.config.server.git.uri = ${CONFIG_REPO_URL:file:///%HOME%/microservices/configstore}
 
-To configure the configuration server to start automatically, edit `src\main\java\deors\demos\microservices\configservice\ConfigserviceApplication.java` and add the following class annotation:
+To configure the configuration server to start automatically, edit `src/main/java/deors/demos/microservices/configservice/ConfigserviceApplication.java` and add the following class annotation:
 
 ```java
 @org.springframework.cloud.config.server.EnableConfigServer
@@ -138,11 +138,11 @@ Go to `https://start.spring.io/` and create the project with the following setti
 
 Extract the generated zip to:
 
-    %HOME%\microservices
+    ~/microservices
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\eurekaservice
+    cd ~/microservices/eurekaservice
 
 First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
@@ -154,7 +154,7 @@ First, let's modify `pom.xml` file to upgrade the Java version to 11:
     </properties>
 ```
 
-When using Java 9+, Spring Boot does not add JAX-B module (java.xml.bind) to Tomcat module path automatically, causing service registry service to fail on startup. In that case, the missing module should be added to Tomcat module path. When using `spring-boot:run` Maven goal to run the application, use the `JDK_JAVA_OPTIONS` environment variable:
+When using Java 9+, Spring Boot does not add JAX-B module (java.xml.bind) to Tomcat module path automatically, causing service registry service to fail on startup. In that case, the missing module should be added to Tomcat module path. When using `spring-boot:run` Maven goal to run the application, it is possible to use the `JDK_JAVA_OPTIONS` environment variable:
 
     set JDK_JAVA_OPTIONS=--add-modules java.xml.bind
     mvnw spring-boot:run
@@ -163,7 +163,7 @@ Or, when executing the fat Jar directly:
 
     java -jar target/<name-of-the-fat.jar> --add-modules java.xml.bind
 
-But the preferred way to fix this is directly in `pom.xml` file:
+But the preferred way to fix this is directly in `pom.xml` file by adding the dependencies with JAX-B API and implementation:
 
 ```xml
     <dependencies>
@@ -184,14 +184,14 @@ But the preferred way to fix this is directly in `pom.xml` file:
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
-    ren src\main\resources\application.properties bootstrap.properties
+    mv src/main/resources/application.properties src/main/resources/bootstrap.properties
 
-Edit `src\main\resources\bootstrap.properties`:
+Edit `src/main/resources/bootstrap.properties`:
 
     spring.application.name = eurekaservice
     spring.cloud.config.uri = http://${CONFIG_HOST:localhost}:${CONFIG_PORT:8888}
 
-To configure the Eureka server to start automatically, edit `src\main\java\deors\demos\microservices\eurekaservice\EurekaserviceApplication.java` and add the following class annotation:
+To configure the Eureka server to start automatically, edit `src/main/java/deors/demos/microservices/eurekaservice/EurekaserviceApplication.java` and add the following class annotation:
 
 ```java
 @org.springframework.cloud.netflix.eureka.server.EnableEurekaServer
@@ -213,11 +213,11 @@ Go to `https://start.spring.io/` and create the project with the following setti
 
 Extract the generated zip to:
 
-    %HOME%\microservices
+    ~/microservices
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\hystrixservice
+    cd ~/microservices/hystrixservice
 
 First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
@@ -231,14 +231,14 @@ First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
-    ren src\main\resources\application.properties bootstrap.properties
+    mv src/main/resources/application.properties src/main/resources/bootstrap.properties
 
-Edit `src\main\resources\bootstrap.properties`:
+Edit `src/main/resources/bootstrap.properties`:
 
     spring.application.name = hystrixservice
     spring.cloud.config.uri = http://${CONFIG_HOST:localhost}:${CONFIG_PORT:8888}
 
-To configure the Hystrix dashboard to start automatically, edit `src\main\java\deors\demos\microservices\hystrixservice\HystrixserviceApplication.java` and add the following class annotations:
+To configure the Hystrix dashboard to start automatically, edit `src/main/java/deors/demos/microservices/hystrixservice/HystrixserviceApplication.java` and add the following class annotations:
 
 ```java
 @org.springframework.cloud.client.discovery.EnableDiscoveryClient
@@ -265,11 +265,11 @@ Go to `https://start.spring.io/` and create the project with the following setti
 
 Extract the generated zip to:
 
-    %HOME%\microservices
+    ~/microservices
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\bookrecservice
+    cd ~/microservices/bookrecservice
 
 First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
@@ -283,14 +283,14 @@ First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
-    ren src\main\resources\application.properties bootstrap.properties
+    mv src/main/resources/application.properties src/main/resources/bootstrap.properties
 
-Edit `src\main\resources\bootstrap.properties`:
+Edit `src/main/resources/bootstrap.properties`:
 
     spring.application.name = bookrecservice
     spring.cloud.config.uri = http://${CONFIG_HOST:localhost}:${CONFIG_PORT:8888}
 
-To configure the service to be discoverable, edit `src\main\java\deors\demos\microservices\bookrecservice\BookrecserviceApplication.java` and add the class annotation:
+To configure the service to be discoverable, edit `src/main/java/deors/demos/microservices/bookrecservice/BookrecserviceApplication.java` and add the class annotation:
 
 ```java
 @org.springframework.cloud.client.discovery.EnableDiscoveryClient
@@ -307,7 +307,8 @@ import javax.persistence.Id;
 @Entity
 public class Book {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
@@ -386,11 +387,11 @@ Go to `https://start.spring.io/` and create the project with the following setti
 
 Extract the generated zip to:
 
-    %HOME%\microservices
+    ~/microservices
 
 Change into extracted directory:
 
-    cd %HOME%\microservices\bookrecedgeservice
+    cd ~/microservices/bookrecedgeservice
 
 First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
@@ -404,14 +405,14 @@ First, let's modify `pom.xml` file to upgrade the Java version to 11:
 
 To ensure that the configuration service is used, properties should be moved to bootstrap phase:
 
-    ren src\main\resources\application.properties bootstrap.properties
+    mv src/main/resources/application.properties src/main/resources/bootstrap.properties
 
-Edit `src\main\resources\bootstrap.properties`:
+Edit `src/main/resources/bootstrap.properties`:
 
     spring.application.name = bookrecedgeservice
     spring.cloud.config.uri = http://${CONFIG_HOST:localhost}:${CONFIG_PORT:8888}
 
-To configure the service to be discoverable (Eureka) and to use the circuit breaker (Hystrix), edit `src\main\java\deors\demos\microservices\bookrecedgeservice\BookrecedgeserviceApplication.java` and add the following class annotations:
+To configure the service to be discoverable (Eureka) and to use the circuit breaker (Hystrix), edit `src/main/java/deors/demos/microservices/bookrecedgeservice/BookrecedgeserviceApplication.java` and add the following class annotations:
 
 ```java
 @org.springframework.cloud.client.discovery.EnableDiscoveryClient
@@ -639,7 +640,7 @@ In this section, pom files will be configured with Spotify's Docker Maven plug-i
 
 Let's proceed with bookrec service as an example. Change to its directory:
 
-    cd %HOME%\microservices\bookrecservice
+    cd ~/microservices/bookrecservice
 
 Edit `pom.xml` and add inside `<properties>` the following property:
 
@@ -807,7 +808,7 @@ Ask Docker to scale out the book recommendation service
 
 ### 2.8) Make and update and roll out the changes without service downtime
 
-Make some change and deploy a rolling update. For example change the text string returned by BookController class in file `src\main\java\deors\demos\microservices\BookController.java`:
+Make some change and deploy a rolling update. For example change the text string returned by BookController class in file `src/main/java/deors/demos/microservices/BookController.java`:
 
 Rebuild and push the new image to the registry:
 
@@ -891,9 +892,9 @@ The upgrade to JUnit 5 requires to adapt the existing unit tests - the Applicati
 
 Let's proceed with bookrec service as an example. Change to its directory:
 
-    cd %HOME%\microservices\bookrecservice
+    cd ~/microservices/bookrecservice
 
-Edit `src\test\java\deors\demos\microservices\bookrecservice\BookrecserviceApplicationTests.java`, modify the `Test` class package, and replace the JUnit 4 `Runner` with a JUnit 5 `Extension`:
+Edit `src/test/java/deors/demos/microservices/bookrecservice/BookrecserviceApplicationTests.java`, modify the `Test` class package, and replace the JUnit 4 `Runner` with a JUnit 5 `Extension`:
 
 ```java
 import org.junit.jupiter.api.Test;
