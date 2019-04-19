@@ -1524,9 +1524,9 @@ For dependency check, it is possible to include a quality gate in the `dependenc
         ...
 ```
 
-It's worth noting that the code analysis and calculation of the quality gate by SonarQube is an asynchronous proces. Depending on SonarQube server load, it might take some time for results to be available, and as a design decision, the `sonar:sonar` goal will not wait, blocking the build, until then. This has the beneficial side effect that the Jenkins executor is not blocked and other builds might be built in the meantime, maximizing utilization of Jenkins build farm resources.
+It's worth noting that the code analysis and calculation of the quality gate by SonarQube is an asynchronous process. Depending on SonarQube server load, it might take some time for results to be available, and as a design decision, the `sonar:sonar` goal will not wait, blocking the build, until then. This has the beneficial side effect that the Jenkins executor is not blocked and other builds might be built in the meantime, maximizing the utilization of Jenkins build farm resources.
 
-The default behavior for SonarQube quality gate, as coded in the `waitForQualityGate` function,  is to break the build in case or warning or error. However, it is better to fail the build only when the quality gate is in error status. To code that behavior in the pipeline, there is a custom `script` block coding that logic.
+The default behavior for SonarQube quality gate, as coded in the `waitForQualityGate` function, is to break the build in case or warning or error. However, it is better to fail the build only when the quality gate is in error status. To code that behavior in the pipeline, there is a custom `script` step implementing that logic.
 
 ### 3.18) The pipeline code: Pushing the Docker image
 
@@ -1546,7 +1546,7 @@ At this point of the pipeline, if all quality gates have passed, the produced im
     ...
 ```
 
-For this command to work, the right credentials might be set. The Spotify Docker plugin that is being used, configures registry credentials in various ways but particularily one is perfect for pipeline usage, as it does not require any pre-configuration in the builder container: credential injection through Maven settings.
+For this command to work, the right credentials must be set. The Spotify Docker plugin that is being used, configures registry credentials in various ways but particularly one is perfect for pipeline usage, as it does not require any pre-configuration in the builder container: credential injection through Maven settings.
 
 So far, the following configuration pieces are set: Spotify plugin sets the server id with the following configuration setting `<serverId>docker-hub</serverId>`, and the pipeline gets the credentials injected as the `DOCKER_HUB` property.
 
