@@ -150,6 +150,8 @@ And to start it again, this command:
 
 ### Create the Docker images
 
+NOTE: Images are already created and pushed to Docker Hub, so this step can be skipped if no changes have been made to the microservices.
+
 To create the images, a Docker host is needed. If using Docker for Windows, Linux or Mac, or boot2docker (VirtualBox), that Docker host is sufficient. It is also possible to use the swarm created before (one machine is enough). Let's start the swarm:
 
     docker-machine start docker-swarm-manager-1 docker-swarm-manager-2 docker-swarm-manager-3 docker-swarm-worker-1 docker-swarm-worker-2 docker-swarm-worker-3
@@ -209,7 +211,7 @@ Once all the services are started, they will be available at the defined ports i
 
 Access the configuration service through the actuator health endpoint (remember it is currently unsecured), to verify it is up & running and responding to requests normally:
 
-    http://localhost:8888/actuator/health
+    http://192.168.66.100:8888/actuator/health
 
 Check that the configuration service is capable of returning the configuration for some of the services:
 
@@ -243,6 +245,8 @@ Go back to Hystrix dashboard and start monitoring the book recommendation edge s
      http://192.168.66.100:8181/actuator/hystrix.stream
 
 Once the Hystric stream is registered, try again to access the edge service, with and without the inner service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
+
+NOTE: When Docker Swarm is configured on a single-node setup with Docker for Windows or Docker for Mac, the Swarm manager address is not accessible from the local computer (Docker runs in an Hyper-V or HyperKit VM, transparently to the user) and `localhost` should be used instead.
 
 ### Scale out the book recommendation service
 
