@@ -256,7 +256,7 @@ Ask Docker to scale out the book recommendation service
 
 ### Make and update and roll out the changes without service downtime
 
-Make some change and deploy a rolling update. For example change the text string returned by BookController class in file `src/main/java/deors/demos/microservices/BookController.java`:
+Make some change and deploy a rolling update. For example change the text string returned by BookController class in file `src/main/java/deors/demos/microservices/BookController.java`.
 
 Rebuild and push the new image to the registry:
 
