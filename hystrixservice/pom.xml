@@ -31,7 +31,7 @@
         <jacoco.version>0.8.3</jacoco.version>
         <pitest.version>1.4.5</pitest.version>
         <pitest-junit5.version>0.8</pitest-junit5.version>
-        <jmeter.version>2.8.5</jmeter.version>
+        <jmeter.version>2.9.0</jmeter.version>
         <dependency-check.version>5.0.0-M3</dependency-check.version>
 
         <jacoco.path>${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar</jacoco.path>
