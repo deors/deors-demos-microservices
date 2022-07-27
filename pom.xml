@@ -18,12 +18,11 @@
     </description>
 
     <modules>
-        <module>deors-demos-microservices-configservice</module>
-        <module>deors-demos-microservices-eurekaservice</module>
-        <module>deors-demos-microservices-hystrixservice</module>
-        <module>deors-demos-microservices-turbineservice</module>
-        <module>deors-demos-microservices-bookrecservice</module>
-        <module>deors-demos-microservices-bookrecedgeservice</module>
+        <module>configservice</module>
+        <module>eurekaservice</module>
+        <module>hystrixservice</module>
+        <module>bookrecservice</module>
+        <module>bookrecedgeservice</module>
     </modules>
 
 </project>
