@@ -84,6 +84,9 @@ Go back to Hystrix dashboard and start monitoring the book recommendation edge s
 
 Once the Hystric stream is registered, try again to access the edge service, with and without the inner service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
 
+
+## NOTE: Section about Docker support is deprecated - kept for historical reasons
+
 ## Running services in Docker Swarm
 
 ### Set up Swarm
