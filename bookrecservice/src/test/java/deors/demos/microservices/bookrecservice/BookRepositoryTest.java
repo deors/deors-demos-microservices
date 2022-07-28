@@ -67,7 +67,7 @@ public class BookRepositoryTest {
         List<Book> foundBooks = bookRepository.getBooksRandomOrder();
 
         assertEquals(12, foundBooks.size(),
-            "the number of found books should be twelve");
+            "the number of found books should be twelve after insert");
 
         List<String> bookTitles = foundBooks.stream().map(b -> b.getTitle()).collect(Collectors.toList());
         List<String> bookAuthors = foundBooks.stream().map(b -> b.getAuthor()).collect(Collectors.toList());
@@ -80,5 +80,14 @@ public class BookRepositoryTest {
             "the list of found books should contain the first book author");
         assertTrue(bookAuthors.contains("the second book author"),
             "the list of found books should contain the second book author");
+
+        entityManager.remove(sample1Book);
+        entityManager.remove(sample2Book);
+        entityManager.flush();
+
+        foundBooks = bookRepository.getBooksRandomOrder();
+
+        assertEquals(10, foundBooks.size(),
+            "the number of found books should be ten after delete");
     }
 }
