@@ -45,45 +45,50 @@ Follow the next sequence for running the services in order so they are able to l
 
 ### Test the services locally
 
-Once all the services are started, they will be available at the defined ports in the local host.
+Once all the services are started, they will be available at localhost at different ports:
+
+    - configservice listens to port 6868
+    - eurekaservice listens to port 7878
+    - hystrixservice port is random
+    - bookrecservice port is random
+    - bookrecedgeservice port is random
 
 Access the configuration service through the actuator health endpoint (remember it is currently unsecured), to verify it is up & running and responding to requests normally:
 
-    http://localhost:8888/actuator/health
+    http://localhost:6868/actuator/health
 
 Check that the configuration service is capable of returning the configuration for some of the services:
 
-    http://localhost:8888/bookrecservice/default
-    http://localhost:8888/eurekaservice/default
+    http://localhost:6868/eurekaservice/default
+    http://localhost:6868/bookrecservice/default
 
-Check that Eureka service is up and the book recommendation service and edge service are registered:
+Check that Eureka service is up and the other services are registered (including the ports assigned during startup time):
 
     http://localhost:7878/
 
 Check that Hystrix service is up and running:
 
-    http://localhost:7979/hystrix
+    http://localhost:<hystrix-port>/hystrix
 
 Access the HAL browser on the book recommendation service:
 
-    http://localhost:8080/
+    http://localhost:<bookrec-port>/
 
 Access the book recommendation service itself:
 
-    http://localhost:8080/bookrec
+    http://localhost:<bookrec-port>/bookrec
 
 Access the book recommendation edge service itself:
 
-    http://localhost:8181/bookrecedge
+    http://localhost:<bookrecedge-port>/bookrecedge
 
 To verify that Hystrix fault tolerance mechanism is working as expected, stop the book recommendation service, and access the book recommendation edge service again. The default recommended book should be returned instead and the application keeps working.
 
 Go back to Hystrix dashboard and start monitoring the book recommendation edge service by registering the bookrec Hystrix stream in the dashboard (and optionally configuring the delay and page title):
 
-     http://localhost:8181/actuator/hystrix.stream
+     http://localhost:<bookrecedge-port>/actuator/hystrix.stream
 
-Once the Hystric stream is registered, try again to access the edge service, with and without the inner service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
-
+Once the Hystric stream is registered, try again to access the edge service, with and without the book recommendation service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
 
 ## NOTE: Section about Docker support is deprecated - kept for historical reasons
 
