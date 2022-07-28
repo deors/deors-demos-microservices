@@ -1,4 +1,4 @@
-package deors.demos.microservices.configservice;
+package deors.demos.microservices.bookrecservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
