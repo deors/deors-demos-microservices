@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jdk-11.0.3_7
+FROM eclipse-temurin:18.0.1_10-jdk
 VOLUME /tmp
 ADD target/dependency/jacocoagent.jar jacocoagent.jar
 ADD target/bookrecedgeservice.jar app.jar
