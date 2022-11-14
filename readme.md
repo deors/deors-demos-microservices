@@ -90,9 +90,118 @@ Go back to Hystrix dashboard and start monitoring the book recommendation edge s
 
 Once the Hystric stream is registered, try again to access the edge service, with and without the book recommendation service up and running, and experiment how thresholds (number of errors in a short period of time) impact the opening and closing of the circuit between the inner and the edge service.
 
-## NOTE: Section about Docker support is deprecated - kept for historical reasons
+## Running services in Kubernetes with Rancher Desktop, K3s and nerdctl
+
+### Building the images
+
+Building the images is a process that varies depending on the OS, containerization platform and tooling used to manage the image and container life cycle.
+
+The following instructions are based on Rancher Desktop, K3s and nerdctl tooling. Rancher Desktop is an easy way to run Kubernetes on a workstation thanks to the use of K3s lightweight distribution, and nerdctl is very convenient as it leverages many of the well-known docker cli commands but for containerd engine.
+
+To ensure that the container images are available to the local Kubernetes cluster, the namespace parameter must be supplied with ```k8s.io``` value. The following commands must be run in the corresponding folder for each microservice:
+
+    nerdctl -n k8s.io build -t deors-demos-microservices-configservice:1.0-SNAPSHOT .
+    nerdctl -n k8s.io build -t deors-demos-microservices-eurekaservice:1.0-SNAPSHOT .
+    nerdctl -n k8s.io build -t deors-demos-microservices-hystrixservice:1.0-SNAPSHOT .
+    nerdctl -n k8s.io build -t deors-demos-microservices-bookrecservice:1.0-SNAPSHOT .
+    nerdctl -n k8s.io build -t deors-demos-microservices-bookrecedgeservice:1.0-SNAPSHOT .
+
+To confirm that images are available, the following command will do the query:
+
+    nerdctl -n k8s.io images | grep deors-demos-microservices
+
+### Running the pods and wiring them all together
+
+Once the images are ready, they can be scheduled in the local cluster. First, proceed with the configuration service:
+
+    kubectl run configservice --image deors-demos-microservices-configservice:1.0-SNAPSHOT
+
+To test the service, use a port forward command:
+
+    kubectl port-forward pods/configservice 6868:6868
+
+And once ready, open the familiar URLs:
+
+    http://localhost:6868/actuator/health
+    http://localhost:6868/eurekaservice/default
+    http://localhost:6868/bookrecservice/default
+
+Once confirmed that the service is working, the port must be exposed to the other microservices can connect with it (the port forward is just for convenience to our own tests):
+
+    kubectl expose pod configservice --port 6868
+
+Next, run Eureka taking into consideration that it needs to connect with the configuration service, expose the port and verify that it is running as expected:
+
+    kubectl run eurekaservice --image deors-demos-microservices-eurekaservice:1.0-SNAPSHOT --env "CONFIG_HOST=configservice"
+    kubectl expose pod eurekaservice --port 7878
+    kubectl port-forward pods/eurekaservice 7878:7878
+    http://localhost:7878/actuator/health
+    http://localhost:7878
+
+Next proceed the same with Hystrix taking into consideration that this service also needs to connect with Eureka:
+
+    kubectl run hystrixservice --image deors-demos-microservices-hystrixservice:1.0-SNAPSHOT --env "CONFIG_HOST=configservice" --env "EUREKA_HOST=eurekaservice" --env "EUREKA_PORT=7878"
+    kubectl expose pod hystrixservice --port <hystrix-port>
+    kubectl port-forward pods/hystrixservice 7979:<hystrix-port>
+    http://localhost:7979/actuator/health
+    http://localhost:7979/hystrix
+
+The Hystrix service is not configured to run with a fixed port, which means that it gets a random port assigned at boot time unless passed as a parameter. To discover that port, it is possible to look into the pod logs but as Eureka is configured and Hystrix service is registering there, the easiest way to look for the port is through Eureka web dashboard. However, for convenience during local tests the port forward can be set to a fixed known port (7979 in the example above).
+
+Finally, it is the moment to run the business services, and verify whether they are working fine:
+
+    kubectl run bookrecservice --image deors-demos-microservices-bookrecservice:1.0-SNAPSHOT --env "CONFIG_HOST=configservice" --env "EUREKA_HOST=eurekaservice" --env "EUREKA_PORT=7878"
+    kubectl expose pod bookrecservice --port <bookrec-port>
+    kubectl port-forward pods/bookrecservice 8080:<bookrec-port>
+    http://localhost:8080/actuator/health
+    http://localhost:8080/bookrec
+
+    kubectl run bookrecedgeservice --image deors-demos-microservices-bookrecedgeservice:1.0-SNAPSHOT --env "CONFIG_HOST=configservice" --env "EUREKA_HOST=eurekaservice" --env "EUREKA_PORT=7878"
+    kubectl expose pod bookrecedgeservice --port <bookrecedge-port>
+    kubectl port-forward pods/bookrecedgeservice 8181:<bookrecedge-port>
+    http://localhost:8181/actuator/health
+    http://localhost:8181/bookrecedge
+
+If everything run as expected and all services are wired through Eureka and Kubernetes services, the book recommendation edge service will be returning valid book recommendations from the defined list. If not, the default book recommendation will be returned.
+
+### Verifying graceful degradation of the book recommendation service
+
+An easy way to check the circuit breaker is, once everything is up and running, to remove the book recommendation Kubernetes service. That way, although the pod is running it will not be accessible to the other pods in our system (but it will be to us through the port forward!), and the edge service will return the default book recommendation:
+
+    kubectl delete service bookrecservice
+    http://localhost:8080/bookrec
+    http://localhost:8181/bookrecedge
+
+By simply recreating the Kubernetes service the circuit will be closed again and the edge service will return to normal behavior:
+
+    kubectl expose pod bookrecservice --port <bookrec-port>
+    http://localhost:8080/bookrec
+    http://localhost:8181/bookrecedge
+
+This is an example of graceful degradation with the help or circuit breakers, reducing the impact of internal failure to customer-facing APIs and user interfaces.
+
+### Cleaning up resources
+
+To clean up resources all pods and services need to be terminated. If any port forward is still open they should be stopped (Ctrl-C), too:
+
+    kubectl delete pod bookrecedgeservice
+    kubectl delete service bookrecedgeservice
+
+    kubectl delete pod bookrecservice
+    kubectl delete service bookrecservice
+
+    kubectl delete pod hystrixservice
+    kubectl delete service hystrixservice
+
+    kubectl delete pod eurekaservice
+    kubectl delete service eurekaservice
+
+    kubectl delete pod configservice
+    kubectl delete service configservice
 
 ## Running services in Docker Swarm
+
+NOTE: Section about Docker support is deprecated - kept for historical reasons
 
 ### Set up Swarm
 
@@ -278,9 +387,7 @@ To check how the change is being deployed, issue this command repeatedly:
 
     docker service ps bookrecservice
 
-## Cleanning up resources
-
-### Stopping services and deleting the swarm
+### Cleanning up resources -- Stopping services and deleting the swarm
 
 To remove running services:
 
