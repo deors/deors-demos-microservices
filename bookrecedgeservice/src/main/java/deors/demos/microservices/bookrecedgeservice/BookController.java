@@ -2,6 +2,8 @@ package deors.demos.microservices.bookrecedgeservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -21,10 +23,15 @@ public class BookController {
     @Value("${defaultBookAuthor}")
     private String defaultBookAuthor;
 
+    @Autowired
+    private CircuitBreakerFactory circuitBreakerFactory;
+
     @RequestMapping("/bookrecedge")
-    @com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand(fallbackMethod = "getDefaultBook")
     public Book getBookRecommendation() {
-        return restTemplate.getForObject("http://bookrecservice/bookrec", Book.class);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("bookrec");
+        return circuitBreaker.run(
+            () -> restTemplate.getForObject("http://bookrecservice/bookrec", Book.class),
+            throwable -> getDefaultBook());
     }
 
     public Book getDefaultBook() {

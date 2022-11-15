@@ -25,8 +25,8 @@
 
         <java.version>18</java.version>
 
-        <spring-cloud.version>2021.0.3</spring-cloud.version>
-        <spring-cloud-hystrix.version>2.2.10.RELEASE</spring-cloud-hystrix.version>
+        <spring-cloud.version>2021.0.5</spring-cloud.version>
+        <spring-cloud-resilience4j.version>2.1.5</spring-cloud-resilience4j.version>
 
         <junit.version>5.8.2</junit.version> <!-- provided by spring-boot-starter-test pom -->
         <jacoco.version>0.8.8</jacoco.version>
@@ -86,8 +86,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-            <version>${spring-cloud-hystrix.version}</version>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+            <version>${spring-cloud-resilience4j.version}</version>
         </dependency>
 
         <dependency>

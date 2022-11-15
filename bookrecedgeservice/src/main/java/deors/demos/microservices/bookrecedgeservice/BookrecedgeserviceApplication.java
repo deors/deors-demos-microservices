@@ -7,7 +7,6 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @org.springframework.cloud.client.discovery.EnableDiscoveryClient
-@org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker
 public class BookrecedgeserviceApplication {
 
     public static void main(String[] args) {
